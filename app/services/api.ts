@@ -40,12 +40,13 @@ export interface ApiResponse<T> {
 }
 
 /* =========================
-   BASE URL dinâmico (DEV)
+   BASE URL dinâmico
    ========================= */
 
 /** Pega o IP do Metro/Expo para device físico. */
 function getLanIPFromExpo(): string | null {
-  // SDKs novos: expoConfig.hostUri | antigos: manifest.debuggerHost
+  // SDKs mais novos: expoConfig.hostUri
+  // SDKs antigos: manifest.debuggerHost
   const hostUri =
     (Constants as any).expoConfig?.hostUri ??
     (Constants as any).manifest?.debuggerHost ??
@@ -57,7 +58,15 @@ function getLanIPFromExpo(): string | null {
   return host;
 }
 
+/** Retorna a base URL apropriada para DEV/PROD. */
 function getBaseURL() {
+  // 1) Se houver variável de ambiente, ela manda (ex.: EXPO_PUBLIC_API_URL=https://foo.com/api)
+  const envUrl =
+    (process.env.EXPO_PUBLIC_API_URL as string | undefined) ||
+    (Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL as string | undefined);
+  if (envUrl) return envUrl.replace(/\/+$/, ''); // remove trailing /
+
+  // 2) DEV
   if (__DEV__) {
     if (Platform.OS === 'android') {
       // Emulador Android (AVD)
@@ -71,8 +80,9 @@ function getBaseURL() {
     return 'http://localhost:5000/api';
   }
 
-  // PROD (troque pelo seu domínio/endpoint)
-  return 'https://seu-dominio-aqui.com/api';
+  // 3) PROD (ajustado para seu Railway)
+  // Se a sua API *não* usa prefixo /api no backend, remova o /api aqui.
+  return 'https://mottu-visiontracker2-production.up.railway.app/api';
 }
 
 const API_BASE_URL = getBaseURL();
@@ -127,7 +137,8 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const url = `${API_BASE_URL}${endpoint}`;
+      const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           ...(options.headers || {}),
@@ -186,7 +197,8 @@ class ApiService {
   async getMotos(): Promise<ApiResponse<Moto[]>> {
     const resp = await this.makeRequest<any>('/motos');
     if (resp.success && resp.data) {
-      // Esperando { data: { data: [...] } } do Flask
+      // Esperando { data: { data: [...] } } do Flask, mas
+      // funciona também se vier só { data: [...] } ou [...]
       const motosRaw = (resp.data as any).data ?? resp.data;
       const motos: Moto[] = (motosRaw as any[]).map(toMoto);
       return {
