@@ -12,12 +12,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useMotoContext } from '../contexts/MotoContext';
-import { useTheme } from '../contexts/ThemeContext';
+import { useMotoContext } from '../contexts/MotoContext';     // <- caminho corrigido
+import { useTheme } from '../contexts/ThemeContext';          // <- caminho corrigido
 
 const MODELOS_MOTOS = ['CG 160', 'Factor 125', 'Biz 125', 'PCX 150', 'CB 600F'] as const;
-const CORES_MOTOS = ['Preta', 'Verde Mottu', 'Branca', 'Vermelha', 'Azul'] as const;
-const STATUS_MOTOS = ['ativa', 'manutencao', 'inativa'] as const;
+const CORES_MOTOS   = ['Preta', 'Verde Mottu', 'Branca', 'Vermelha', 'Azul'] as const;
+const STATUS_MOTOS  = ['ativa', 'manutencao', 'inativa'] as const;
 type StatusMoto = (typeof STATUS_MOTOS)[number];
 
 export default function CadastrarMotoScreen() {
@@ -31,7 +31,6 @@ export default function CadastrarMotoScreen() {
   const [proprietario, setProprietario] = useState('');
   const [status, setStatus] = useState<StatusMoto>('ativa');
 
-  // dropdowns simples sem libs
   const [openModelo, setOpenModelo] = useState(false);
   const [openCor, setOpenCor] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
@@ -40,32 +39,19 @@ export default function CadastrarMotoScreen() {
     if (error) {
       Alert.alert('Erro', error, [{ text: 'OK', onPress: clearError }]);
     }
-    // garante que não fica alerta pendurado ao desmontar
-    return () => {
-      if (error) clearError?.();
-    };
+    return () => { if (error) clearError?.(); };
   }, [error, clearError]);
 
   const placaSanitizada = useMemo(() => placa.trim().toUpperCase(), [placa]);
 
   const validarFormulario = useCallback((): boolean => {
-    if (!placaSanitizada) {
-      Alert.alert('Erro', 'Por favor, insira a placa da moto');
-      return false;
-    }
-    if (!proprietario.trim()) {
-      Alert.alert('Erro', 'Por favor, insira o nome do proprietário');
-      return false;
-    }
-    if (proprietario.trim().length < 2) {
-      Alert.alert('Erro', 'O nome do proprietário deve ter pelo menos 2 caracteres');
-      return false;
-    }
+    if (!placaSanitizada) { Alert.alert('Erro', 'Por favor, insira a placa da moto'); return false; }
+    if (!proprietario.trim()) { Alert.alert('Erro', 'Por favor, insira o nome do proprietário'); return false; }
+    if (proprietario.trim().length < 2) { Alert.alert('Erro', 'O nome do proprietário deve ter pelo menos 2 caracteres'); return false; }
 
     // AAA0000 (antiga) ou AAA0A00 (Mercosul)
     const placaAntigaRegex = /^[A-Z]{3}[0-9]{4}$/;
     const placaMercosulRegex = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
-
     if (!placaAntigaRegex.test(placaSanitizada) && !placaMercosulRegex.test(placaSanitizada)) {
       Alert.alert('Erro', 'Formato de placa inválido. Use AAA0000 ou AAA0A00');
       return false;
@@ -74,15 +60,18 @@ export default function CadastrarMotoScreen() {
   }, [placaSanitizada, proprietario]);
 
   const handleCadastrar = useCallback(async () => {
-    if (isLoading) return; // evita duplo clique
+    if (isLoading) return;
     if (!validarFormulario()) return;
+
+    // mapeia status para o formato do backend (ATIVA/MANUTENCAO)
+    const statusApi = status === 'manutencao' ? 'MANUTENCAO' : 'ATIVA';
 
     const sucesso = await adicionarMoto({
       placa: placaSanitizada,
       modelo,
       cor,
       proprietario: proprietario.trim(),
-      status,
+      status: statusApi as any,
       localizacao: {
         setor: 'A1',
         posicao: `${Math.floor(Math.random() * 10) + 1}`,
@@ -95,13 +84,13 @@ export default function CadastrarMotoScreen() {
         {
           text: 'OK',
           onPress: () => {
-            // reset
             setPlaca('');
             setModelo(MODELOS_MOTOS[0]);
             setCor(CORES_MOTOS[1]);
             setProprietario('');
             setStatus('ativa');
-            router.replace('/(tabs)/motos');
+            // sem /(tabs) no path!
+            router.replace('/motos');
           },
         },
       ]);
@@ -109,19 +98,10 @@ export default function CadastrarMotoScreen() {
   }, [isLoading, validarFormulario, adicionarMoto, placaSanitizada, modelo, cor, proprietario, status, router]);
 
   const ItemPicker = ({
-    label,
-    value,
-    open,
-    setOpen,
-    options,
-    onSelect,
+    label, value, open, setOpen, options, onSelect,
   }: {
-    label: string;
-    value: string;
-    open: boolean;
-    setOpen: (v: boolean) => void;
-    options: readonly string[];
-    onSelect: (v: string) => void;
+    label: string; value: string; open: boolean; setOpen: (v: boolean) => void;
+    options: readonly string[]; onSelect: (v: string) => void;
   }) => (
     <View style={{ width: '100%', marginBottom: 12 }}>
       <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
@@ -139,10 +119,7 @@ export default function CadastrarMotoScreen() {
             <TouchableOpacity
               key={opt}
               style={styles.dropdownItem}
-              onPress={() => {
-                onSelect(opt);
-                setOpen(false);
-              }}
+              onPress={() => { onSelect(opt); setOpen(false); }}
               disabled={isLoading}
             >
               <Text style={{ color: colors.text }}>{opt}</Text>
@@ -154,18 +131,11 @@ export default function CadastrarMotoScreen() {
   );
 
   const getStatusColor = (s: StatusMoto) =>
-    ({
-      ativa: colors.success,
-      manutencao: colors.warning,
-      inativa: colors.error,
-    }[s] ?? colors.textSecondary);
+    ({ ativa: colors.success, manutencao: colors.warning, inativa: colors.error }[s] ?? colors.textSecondary);
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-      <ScrollView
-        contentContainerStyle={[styles.scrollContainer, { backgroundColor: colors.background }]}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={[styles.scrollContainer, { backgroundColor: colors.background }]} keyboardShouldPersistTaps="handled">
         <Text style={[styles.title, { color: colors.text }]}>Cadastrar Nova Moto</Text>
 
         {/* Placa */}
@@ -178,11 +148,8 @@ export default function CadastrarMotoScreen() {
             autoCorrect={false}
             maxLength={7}
             value={placaSanitizada}
-            onChangeText={(t) => setPlaca(t)}
-            style={[
-              styles.input,
-              { borderColor: colors.border, backgroundColor: colors.surface, color: colors.text },
-            ]}
+            onChangeText={setPlaca}
+            style={[styles.input, { borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }]}
             editable={!isLoading}
           />
         </View>
@@ -197,33 +164,18 @@ export default function CadastrarMotoScreen() {
             autoCorrect
             value={proprietario}
             onChangeText={setProprietario}
-            style={[
-              styles.input,
-              { borderColor: colors.border, backgroundColor: colors.surface, color: colors.text },
-            ]}
+            style={[styles.input, { borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }]}
             editable={!isLoading}
           />
         </View>
 
         {/* Modelo */}
-        <ItemPicker
-          label="Modelo"
-          value={modelo}
-          open={openModelo}
-          setOpen={setOpenModelo}
-          options={MODELOS_MOTOS}
-          onSelect={(v) => setModelo(v as (typeof MODELOS_MOTOS)[number])}
-        />
+        <ItemPicker label="Modelo" value={modelo} open={openModelo} setOpen={setOpenModelo} options={MODELOS_MOTOS}
+          onSelect={(v) => setModelo(v as (typeof MODELOS_MOTOS)[number])} />
 
         {/* Cor */}
-        <ItemPicker
-          label="Cor"
-          value={cor}
-          open={openCor}
-          setOpen={setOpenCor}
-          options={CORES_MOTOS}
-          onSelect={(v) => setCor(v as (typeof CORES_MOTOS)[number])}
-        />
+        <ItemPicker label="Cor" value={cor} open={openCor} setOpen={setOpenCor} options={CORES_MOTOS}
+          onSelect={(v) => setCor(v as (typeof CORES_MOTOS)[number])} />
 
         {/* Status */}
         <View style={{ width: '100%', marginBottom: 12 }}>
@@ -239,15 +191,8 @@ export default function CadastrarMotoScreen() {
           {openStatus && (
             <View style={[styles.dropdown, { borderColor: colors.border, backgroundColor: colors.surface }]}>
               {STATUS_MOTOS.map((opt) => (
-                <TouchableOpacity
-                  key={opt}
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    setStatus(opt);
-                    setOpenStatus(false);
-                  }}
-                  disabled={isLoading}
-                >
+                <TouchableOpacity key={opt} style={styles.dropdownItem}
+                  onPress={() => { setStatus(opt); setOpenStatus(false); }} disabled={isLoading}>
                   <Text style={{ color: getStatusColor(opt as StatusMoto), fontWeight: '700' }}>{opt}</Text>
                 </TouchableOpacity>
               ))}
@@ -265,7 +210,9 @@ export default function CadastrarMotoScreen() {
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={[styles.buttonText, { color: isDark ? '#000' : '#fff' }]}>Cadastrar Moto</Text>
+            <Text style={[styles.buttonText, { color: '#fff' }]}>{/* texto branco sempre dá contraste */}
+              Cadastrar Moto
+            </Text>
           )}
         </TouchableOpacity>
 
@@ -283,71 +230,15 @@ export default function CadastrarMotoScreen() {
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    padding: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  label: {
-    marginBottom: 6,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  input: {
-    width: '100%',
-    height: 48,
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    marginBottom: 12,
-  },
-  select: {
-    width: '100%',
-    height: 48,
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    justifyContent: 'center',
-  },
-  dropdown: {
-    borderWidth: 1,
-    borderRadius: 8,
-    marginTop: 6,
-    overflow: 'hidden',
-  },
-  dropdownItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-  },
-  button: {
-    width: '100%',
-    height: 50,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12,
-  },
-  buttonText: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  backButton: {
-    flexDirection: 'row',
-    marginTop: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 1,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
+  scrollContainer: { flexGrow: 1, padding: 20, alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  label: { marginBottom: 6, fontSize: 13, fontWeight: '600' },
+  input: { width: '100%', height: 48, borderRadius: 8, borderWidth: 1, paddingHorizontal: 12, marginBottom: 12 },
+  select: { width: '100%', height: 48, borderRadius: 8, borderWidth: 1, paddingHorizontal: 12, justifyContent: 'center' },
+  dropdown: { borderWidth: 1, borderRadius: 8, marginTop: 6, overflow: 'hidden' },
+  dropdownItem: { paddingVertical: 12, paddingHorizontal: 12 },
+  button: { width: '100%', height: 50, borderRadius: 8, alignItems: 'center', justifyContent: 'center', marginTop: 12 },
+  buttonText: { fontWeight: 'bold', fontSize: 16 },
+  backButton: { flexDirection: 'row', marginTop: 16, paddingVertical: 10, paddingHorizontal: 20, borderWidth: 1, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  backButtonText: { fontSize: 14, fontWeight: 'bold' },
 });
