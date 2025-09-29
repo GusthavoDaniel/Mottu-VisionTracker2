@@ -1,0 +1,56 @@
+{
+  "motos": [
+    {
+      "id": "1",
+      "placa": "ABC1D23",
+      "modelo": "Honda CG 160",
+      "status": "ATIVA"
+    },
+    {
+      "id": "2",
+      "placa": "XYZ9Z99",
+      "modelo": "Yamaha Fazer",
+      "status": "MANUTENCAO"
+    },
+    {
+      "id": "21b5",
+      "placa": "ABC1D23",
+      "modelo": "CG 160",
+      "cor": "Verde Mottu",
+      "numeroSerie": "SN1759183325378",
+      "tagRFID": "RF1759183325378",
+      "filialId": 1,
+      "proprietario": "guh",
+      "ativa": true
+    },
+    {
+      "id": "9920",
+      "placa": "AAA1D12",
+      "modelo": "CG 160",
+      "cor": "Verde Mottu",
+      "numeroSerie": "SN1759183352822",
+      "tagRFID": "RF1759183352822",
+      "filialId": 1,
+      "proprietario": "fdfd",
+      "ativa": true
+    }
+  ],
+  "alertas": [
+    {
+      "id": "1",
+      "tipo": "BATERIA_BAIXA",
+      "mensagem": "Bateria abaixo de 20%"
+    },
+    {
+      "id": "2",
+      "tipo": "ROUBO",
+      "mensagem": "Botão SOS acionado"
+    }
+  ],
+  "health": [
+    {
+      "id": "1",
+      "ok": true
+    }
+  ]
+}

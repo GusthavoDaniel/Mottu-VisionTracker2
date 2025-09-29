@@ -1,9 +1,9 @@
 import React from 'react';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import useThemeColors from '../hooks/useThemeColors';
+import useThemeColors from '../hooks/useThemeColors'; // <- caminho correto
 
-export default function TabLayout() {
+export default function TabsLayout() {
   const { colors } = useThemeColors();
 
   return (
@@ -85,19 +85,9 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Telas escondidas da tab */}
-      <Tabs.Screen
-        name="cadastrarMoto"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="registrarEventoRfid"
-        options={{
-          href: null,
-        }}
-      />
+      {/* Telas fora da tab bar */}
+      <Tabs.Screen name="cadastrarMoto" options={{ href: null }} />
+      <Tabs.Screen name="registrarEventoRfid" options={{ href: null }} />
     </Tabs>
   );
 }
