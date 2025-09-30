@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useFocusEffect, router } from 'expo-router';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { Motos, Moto } from '../services/motos';         // <- caminho correto
+import { Motos, Moto } from '../services/motos';         
 import useThemeColors from '../hooks/useThemeColors';
 
 export default function MotosList() {
