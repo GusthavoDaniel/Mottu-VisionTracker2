@@ -1,21 +1,26 @@
-const BASE = process.env.EXPO_PUBLIC_API_URL!;
-if (!BASE) {
-  // ajuda a detectar .env ausente
-  // eslint-disable-next-line no-console
-  console.warn('EXPO_PUBLIC_API_URL não definido. Crie um .env na raiz.');
-}
+export const API_BASE =
+  (process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '') ||
+    (__DEV__ ? 'http://10.0.2.2:8080' : 'http://localhost:8080'));
 
-export async function http(path: string, init?: RequestInit) {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
-    ...init,
-  });
+type Opts = {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: any;
+};
+
+export async function http<T = any>(path: string, opts: Opts = {}): Promise<T> {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  const res = await fetch(`${API_BASE}${path}`, { ...opts, headers });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => `HTTP ${res.status}`);
-    throw new Error(text || `HTTP ${res.status}`);
+    const text = await res.text().catch(() => '');
+    const err: any = new Error(`Erro na requisição (${res.status})`);
+    err.status = res.status;
+    err.body = text;
+    throw err;
   }
 
-  const ct = res.headers.get('content-type') || '';
-  return ct.includes('application/json') ? res.json() : res.text();
+  if (res.status === 204) return undefined as T;
+  const isJson = (res.headers.get('content-type') || '').includes('application/json');
+  return (isJson ? res.json() : (res.text() as any)) as T;
 }
