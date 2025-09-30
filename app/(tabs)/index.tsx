@@ -2,9 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { FontAwesome5, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Alert } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
-
 
 const MOTTU_RED = '#FF3B30';
 const MOTTU_ORANGE = '#FF9500';
@@ -15,11 +13,13 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Stack.Screen options={{ 
-        title: 'Dashboard', 
-        headerStyle: { backgroundColor: colors.background }, 
-        headerTintColor: colors.text 
-      }} />
+      <Stack.Screen
+        options={{
+          title: 'Dashboard',
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text,
+        }}
+      />
 
       <Text style={[styles.headerTitle, { color: colors.text }]}>Mottu Pátio Operacional</Text>
 
@@ -59,25 +59,28 @@ export default function DashboardScreen() {
 
       {/* Ações Rápidas */}
       <View style={styles.actionsRow}>
-        <TouchableOpacity 
-          style={[styles.actionButton, { backgroundColor: colors.accent }]} 
-          onPress={() => router.push('(tabs)/mapaPatio')}
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: colors.accent }]}
+          onPress={() => router.push('/mapaPatio')}
+          activeOpacity={0.85}
         >
           <FontAwesome5 name="map-marked-alt" size={24} color={isDark ? '#121212' : '#FFFFFF'} />
           <Text style={[styles.actionButtonText, { color: isDark ? '#121212' : '#FFFFFF' }]}>Ver Pátio</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.actionButton, { backgroundColor: colors.accent }]} 
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: colors.accent }]}
           onPress={() => router.push('/registrarEventoRfid')}
+          activeOpacity={0.85}
         >
           <MaterialIcons name="wifi-tethering" size={24} color={isDark ? '#121212' : '#FFFFFF'} />
           <Text style={[styles.actionButtonText, { color: isDark ? '#121212' : '#FFFFFF' }]}>Registrar RFID</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.actionButton, { backgroundColor: colors.accent }]} 
-          onPress={() => Alert.alert('Em desenvolvimento', 'Relatórios em breve.')}
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: colors.accent }]}
+          onPress={() => router.push('/relatorios')}
+          activeOpacity={0.85}
         >
           <MaterialCommunityIcons name="file-chart" size={24} color={isDark ? '#121212' : '#FFFFFF'} />
           <Text style={[styles.actionButtonText, { color: isDark ? '#121212' : '#FFFFFF' }]}>Relatórios</Text>
@@ -88,73 +91,17 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  summaryCard: {
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  summaryText: {
-    fontSize: 18,
-    marginLeft: 15,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  alertCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: MOTTU_RED,
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  alertText: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  kpiCard: {
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  kpiText: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-    marginBottom: 30,
-  },
-  actionButton: {
-    borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    alignItems: 'center',
-    width: '30%',
-  },
-  actionButtonText: {
-    marginTop: 5,
-    fontSize: 12,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+  container: { flex: 1, paddingHorizontal: 20, paddingTop: 20 },
+  headerTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  summaryCard: { borderRadius: 10, padding: 20, marginBottom: 20 },
+  summaryRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
+  summaryText: { fontSize: 18, marginLeft: 15 },
+  sectionTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
+  alertCard: { borderLeftWidth: 4, borderLeftColor: MOTTU_RED, padding: 15, borderRadius: 8, marginBottom: 20 },
+  alertText: { fontSize: 16, marginBottom: 8 },
+  kpiCard: { padding: 15, borderRadius: 8, marginBottom: 20 },
+  kpiText: { fontSize: 16, marginBottom: 8 },
+  actionsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, marginBottom: 30 },
+  actionButton: { borderRadius: 10, paddingVertical: 15, paddingHorizontal: 15, alignItems: 'center', width: '30%' },
+  actionButtonText: { marginTop: 5, fontSize: 12, fontWeight: 'bold', textAlign: 'center' },
 });
