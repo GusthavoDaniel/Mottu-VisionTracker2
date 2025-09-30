@@ -66,23 +66,22 @@ function getBaseURL() {
     (Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL as string | undefined);
   if (envUrl) return envUrl.replace(/\/+$/, ''); // remove trailing /
 
-  // 2) DEV
+  // 2) DEV - Nova API Java Spring Boot
   if (__DEV__) {
     if (Platform.OS === 'android') {
       // Emulador Android (AVD)
-      return 'http://10.0.2.2:5000/api';
+      return 'http://10.0.2.2:8080/api';
     }
     // Device físico (ou dev build) via Expo
     const lan = getLanIPFromExpo();
-    if (lan) return `http://${lan}:5000/api`;
+    if (lan) return `http://${lan}:8080/api`;
 
     // Simulador iOS
-    return 'http://localhost:5000/api';
+    return 'http://localhost:8080/api';
   }
 
-  // 3) PROD (ajustado para seu Railway)
-  // Se a sua API *não* usa prefixo /api no backend, remova o /api aqui.
-  return 'https://mottu-visiontracker2-production.up.railway.app/api';
+  // 3) PROD - API Java Spring Boot
+  return 'https://mottu-visiontracker-api-production.up.railway.app/api';
 }
 
 const API_BASE_URL = getBaseURL();
@@ -98,14 +97,34 @@ const toMoto = (m: any): Moto => ({
   cor: String(m.cor),
   proprietario: String(m.proprietario),
   localizacao: {
-    setor: 'A1',
-    posicao: '1',
-    ultimaAtualizacao: String(m.dataAtualizacao),
+    setor: String(m.setor || 'A1'),
+    posicao: String(m.posicao || '1'),
+    ultimaAtualizacao: String(m.updatedAt || m.createdAt),
   },
-  status: (m.ativa ? 'ativa' : 'inativa') as Moto['status'],
-  createdAt: String(m.dataCriacao),
-  updatedAt: String(m.dataAtualizacao),
+  status: mapStatusFromJava(m.status),
+  createdAt: String(m.createdAt),
+  updatedAt: String(m.updatedAt),
 });
+
+// Helper para mapear status da API Java para o frontend
+const mapStatusFromJava = (status: string): Moto['status'] => {
+  switch (status?.toUpperCase()) {
+    case 'ATIVA': return 'ativa';
+    case 'MANUTENCAO': return 'manutencao';
+    case 'INATIVA': return 'inativa';
+    default: return 'ativa';
+  }
+};
+
+// Helper para mapear status do frontend para a API Java
+const mapStatusToJava = (status: Moto['status']): string => {
+  switch (status) {
+    case 'ativa': return 'ATIVA';
+    case 'manutencao': return 'MANUTENCAO';
+    case 'inativa': return 'INATIVA';
+    default: return 'ATIVA';
+  }
+};
 
 /** Tenta parsear JSON; se falhar, retorna null. */
 async function safeJson(res: Response) {
@@ -197,10 +216,9 @@ class ApiService {
   async getMotos(): Promise<ApiResponse<Moto[]>> {
     const resp = await this.makeRequest<any>('/motos');
     if (resp.success && resp.data) {
-      // Esperando { data: { data: [...] } } do Flask, mas
-      // funciona também se vier só { data: [...] } ou [...]
-      const motosRaw = (resp.data as any).data ?? resp.data;
-      const motos: Moto[] = (motosRaw as any[]).map(toMoto);
+      // API Java retorna array direto no campo data
+      const motosRaw = Array.isArray(resp.data) ? resp.data : [resp.data];
+      const motos: Moto[] = motosRaw.map(toMoto);
       return {
         success: true,
         data: motos,
@@ -213,8 +231,7 @@ class ApiService {
   async getMotoById(id: string): Promise<ApiResponse<Moto>> {
     const resp = await this.makeRequest<any>(`/motos/${id}`);
     if (resp.success && resp.data) {
-      const mRaw = (resp.data as any).data ?? resp.data;
-      const moto: Moto = toMoto(mRaw);
+      const moto: Moto = toMoto(resp.data);
       return { success: true, data: moto, message: 'Moto encontrada' };
     }
     return resp as ApiResponse<Moto>;
@@ -223,25 +240,25 @@ class ApiService {
   async createMoto(
     motoData: Omit<Moto, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<ApiResponse<Moto>> {
-    const motoFlask = {
+    const motoJava = {
       placa: motoData.placa,
       modelo: motoData.modelo,
       cor: motoData.cor,
+      proprietario: motoData.proprietario,
       numeroSerie: `SN${Date.now()}`,
       tagRFID: `RF${Date.now()}`,
-      filialId: 1,
-      proprietario: motoData.proprietario,
-      ativa: motoData.status === 'ativa',
+      status: mapStatusToJava(motoData.status),
+      setor: motoData.localizacao?.setor || 'A1',
+      posicao: motoData.localizacao?.posicao || String(Math.floor(Math.random() * 10) + 1),
     };
 
     const resp = await this.makeRequest<any>('/motos', {
       method: 'POST',
-      body: JSON.stringify(motoFlask),
+      body: JSON.stringify(motoJava),
     });
 
     if (resp.success && resp.data) {
-      const mRaw = (resp.data as any).data ?? resp.data;
-      const moto: Moto = toMoto(mRaw);
+      const moto: Moto = toMoto(resp.data);
       return {
         success: true,
         data: moto,
@@ -255,22 +272,28 @@ class ApiService {
     id: string,
     motoData: Partial<Omit<Moto, 'id' | 'createdAt'>>
   ): Promise<ApiResponse<Moto>> {
-    const motoFlask = {
+    const motoJava = {
       placa: motoData.placa,
       modelo: motoData.modelo,
       cor: motoData.cor,
       proprietario: motoData.proprietario,
-      ativa: motoData.status === 'ativa',
+      status: motoData.status ? mapStatusToJava(motoData.status) : undefined,
+      setor: motoData.localizacao?.setor,
+      posicao: motoData.localizacao?.posicao,
     };
+
+    // Remove campos undefined
+    Object.keys(motoJava).forEach(key => 
+      motoJava[key as keyof typeof motoJava] === undefined && delete motoJava[key as keyof typeof motoJava]
+    );
 
     const resp = await this.makeRequest<any>(`/motos/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(motoFlask),
+      body: JSON.stringify(motoJava),
     });
 
     if (resp.success && resp.data) {
-      const mRaw = (resp.data as any).data ?? resp.data;
-      const moto: Moto = toMoto(mRaw);
+      const moto: Moto = toMoto(resp.data);
       return {
         success: true,
         data: moto,
@@ -286,22 +309,46 @@ class ApiService {
 
   // ===== Dashboard =====
   async getDashboardData(): Promise<ApiResponse<any>> {
-    return this.makeRequest('/rfid/dashboard');
+    // Buscar estatísticas das motos e alertas
+    try {
+      const [motosResp, alertasResp] = await Promise.all([
+        this.makeRequest('/motos/stats'),
+        this.makeRequest('/alertas/stats')
+      ]);
+
+      const dashboardData = {
+        motos: motosResp.success ? motosResp.data : { total: 0, ativas: 0, manutencao: 0, inativas: 0 },
+        alertas: alertasResp.success ? alertasResp.data : { total: 0, naoResolvidos: 0, resolvidos: 0 },
+      };
+
+      return {
+        success: true,
+        data: dashboardData,
+        message: 'Dashboard carregado com sucesso',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Erro ao carregar dashboard',
+        error: String(error),
+      };
+    }
   }
 
   // ===== Alertas =====
   async getAlertas(): Promise<ApiResponse<Alerta[]>> {
-    const resp = await this.makeRequest<any>('/rfid/alertas');
+    const resp = await this.makeRequest<any>('/alertas');
     if (resp.success && resp.data) {
-      const listRaw = (resp.data as any).data ?? resp.data;
-      const alertas: Alerta[] = (listRaw as any[]).map(
-        (alerta: any, index: number): Alerta => ({
-          id: `alerta_${index}`,
-          motoId: alerta.moto?.id ? String(alerta.moto.id) : 'unknown',
-          tipo: this.mapTipoAlerta(String(alerta.tipo)),
-          descricao: String(alerta.mensagem),
-          timestamp: String(alerta.data),
-          resolvido: false,
+      // API Java retorna array direto no campo data
+      const alertasRaw = Array.isArray(resp.data) ? resp.data : [resp.data];
+      const alertas: Alerta[] = alertasRaw.map(
+        (alerta: any): Alerta => ({
+          id: String(alerta.id),
+          motoId: alerta.moto?.id ? String(alerta.moto.id) : String(alerta.motoId || 'unknown'),
+          tipo: this.mapTipoAlertaFromJava(alerta.tipo),
+          descricao: String(alerta.descricao),
+          timestamp: String(alerta.timestamp),
+          resolvido: Boolean(alerta.resolvido),
         })
       );
 
@@ -314,30 +361,39 @@ class ApiService {
     return resp as ApiResponse<Alerta[]>;
   }
 
-  private mapTipoAlerta(tipo: string): Alerta['tipo'] {
+  private mapTipoAlertaFromJava(tipo: string): Alerta['tipo'] {
     const mapeamento: Record<string, Alerta['tipo']> = {
-      sem_leitura: 'movimento_nao_autorizado',
-      bateria_baixa: 'bateria_baixa',
-      manutencao: 'manutencao_necessaria',
-      fora_area: 'fora_da_area',
+      'MOVIMENTO_NAO_AUTORIZADO': 'movimento_nao_autorizado',
+      'MANUTENCAO_NECESSARIA': 'manutencao_necessaria',
+      'BATERIA_BAIXA': 'bateria_baixa',
+      'FORA_DA_AREA': 'fora_da_area',
+      'SEM_LEITURA': 'movimento_nao_autorizado', // Mapear para movimento não autorizado
     };
     return mapeamento[tipo] || 'movimento_nao_autorizado';
   }
 
   async resolverAlerta(id: string): Promise<ApiResponse<Alerta>> {
-    // Simulação local
-    return {
-      success: true,
-      data: {
-        id,
-        motoId: 'unknown',
-        tipo: 'movimento_nao_autorizado',
-        descricao: 'Alerta resolvido',
-        timestamp: new Date().toISOString(),
-        resolvido: true,
-      },
-      message: 'Alerta resolvido com sucesso',
-    };
+    const resp = await this.makeRequest<any>(`/alertas/${id}/resolve`, {
+      method: 'PATCH',
+    });
+
+    if (resp.success && resp.data) {
+      const alerta: Alerta = {
+        id: String(resp.data.id),
+        motoId: resp.data.moto?.id ? String(resp.data.moto.id) : String(resp.data.motoId || 'unknown'),
+        tipo: this.mapTipoAlertaFromJava(resp.data.tipo),
+        descricao: String(resp.data.descricao),
+        timestamp: String(resp.data.timestamp),
+        resolvido: Boolean(resp.data.resolvido),
+      };
+
+      return {
+        success: true,
+        data: alerta,
+        message: 'Alerta resolvido com sucesso',
+      };
+    }
+    return resp as ApiResponse<Alerta>;
   }
 
   // ===== Filiais =====

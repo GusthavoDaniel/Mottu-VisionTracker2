@@ -1,236 +1,178 @@
-# Mottu VisionTracker - Sprint 3
+# Mottu VisionTracker
 
-Sistema de Gestão Inteligente de Pátio com tecnologia RFID desenvolvido em React Native com Expo.
+Este projeto consiste em um aplicativo móvel desenvolvido em React Native para rastreamento de motos e uma API de backend em Java com Spring Boot para gerenciar os dados das motos e alertas.
 
-## 📱 Sobre o Aplicativo
+## Requisitos da Sprint 3
 
-O **Mottu VisionTracker** é um protótipo funcional de aplicativo móvel que simula um sistema completo de mapeamento inteligente de pátio e gestão de motos, utilizando tecnologia RFID. O aplicativo oferece uma interface moderna e intuitiva para gerenciar frotas de motocicletas em tempo real.
+Esta entrega intermediária do projeto de aplicativo móvel desenvolvido em React Native visa refletir boa parte das funcionalidades planejadas, agora com uma API Java robusta no backend. O protótipo entregue anteriormente foi transformado em uma base concreta de desenvolvimento, com código limpo, integração com a API e interface minimamente refinada.
 
-### 🎯 Proposta
+### Critérios de Avaliação e Pontuação
 
-Desenvolver uma solução mobile que permita:
-- Cadastro e gerenciamento completo de motos
-- Sistema de autenticação seguro
-- Monitoramento em tempo real via simulação RFID
-- Interface adaptativa com suporte a tema claro/escuro
-- Integração com API para operações CRUD
+1.  **Telas funcionais integradas com API (40 pontos)**
+    *   Implementação de funcionalidades completas utilizando a API Java.
+    *   Operações CRUD (Create, Read, Update, Delete) para motos.
+    *   Tratamento completo de formulários: validações, mensagens de erro, feedback ao usuário.
+    *   Indicadores de carregamento em chamadas de rede.
 
-## 👥 Integrantes da Equipe
+2.  **Sistema de Login (20 pontos)**
+    *   Manutenção do Firebase Authentication para o fluxo de autenticação.
+    *   Validação dos formulários, tratamentos de erros e indicadores de carregamento.
 
-| Nome | RM | GitHub |
-|------|----|---------| 
-| **Gusthavo Daniel de Souza** | RM554681 | [@GusthavoDaniel](https://github.com/GusthavoDaniel) |
-| **Guilherme Damasio Roselli** | RM555873 | [@guilherme-roselli](https://github.com/guilherme-roselli) |
-| **Lucas Miranda Leite** | RM555161 | [@lucas-miranda](https://github.com/lucas-miranda) |
+3.  **Estilização com Tema (15 pontos)**
+    *   Suporte a modo claro e modo escuro.
+    *   Personalização visual consistente (cores, fontes, imagens).
+    *   Seguindo guidelines de design (Material Design ou Apple Human Interface Guidelines).
+    *   Criatividade e identidade visual coerente.
 
-*Projeto desenvolvido para a disciplina de Mobile Application Development - 3ª Sprint*
+4.  **Arquitetura de Código (15 pontos)**
+    *   Organização lógica de arquivos, pastas e componentes.
+    *   Nomenclatura padronizada de variáveis, funções e componentes.
+    *   Separação adequada de responsabilidades (componentes, serviços, estilos, rotas, contextos, etc.).
+    *   Código limpo, legível e bem estruturado.
+    *   Indentação correta e formatação padronizada.
+    *   Uso de boas práticas específicas do desenvolvimento com React Native e Spring Boot.
+    *   Utilização de ferramentas como ESLint, Prettier ou o formatador do editor.
+    *   Bibliotecas utilizadas relevantes, atualizadas e necessárias.
 
-## 🚀 Funcionalidades Implementadas (Sprint 3)
+5.  **Documentação e Apresentação (10 pontos)**
+    *   Repositório contendo este arquivo `README.md` com:
+        *   Nome do app
+        *   Proposta e funcionalidades
+        *   Estrutura de pastas
+        *   Nome, RM e GitHub de todos os integrantes
+    *   Gravação de vídeo demonstrando o app em funcionamento real (emulador ou dispositivo), apresentando todas as funcionalidades. (A ser gerado pelo usuário)
 
-### ✅ Sistema de Autenticação Completo
-- **Tela de Login**: Interface moderna com validação de email e senha
-- **Tela de Cadastro**: Registro de novos usuários com validações robustas
-- **Funcionalidade de Logout**: Saída segura do sistema
-- **Persistência de Sessão**: Manutenção do estado de login entre sessões
+### Penalidades
 
-### ✅ Integração com API Simulada
-- **Operações CRUD Completas**: Create, Read, Update, Delete para motos
-- **Indicadores de Carregamento**: Feedback visual durante operações de rede
-- **Tratamento de Erros**: Mensagens informativas para falhas de conexão
-- **Validação de Formulários**: Validação client-side e server-side simulada
+*   Não entregar via GitHub Classroom (-20 pontos)
+*   Não entregar vídeo de apresentação (-20 pontos)
+*   Ausência do arquivo README.md (-10 pontos)
+*   Não utilizar tema (modo claro/escuro) (-20 pontos)
+*   Aplicativo fora do escopo das aulas (-60 pontos)
+*   Remoção de telas entregues na Sprint anterior (-100 pontos)
+*   Histórico do Git incoerente ou confuso (-50 pontos)
 
-### ✅ Sistema de Tema Avançado
-- **Modo Claro/Escuro**: Alternância dinâmica entre temas
-- **Cores Consistentes**: Paleta de cores aplicada em toda a aplicação
-- **Persistência de Preferência**: Tema salvo entre sessões
+## Arquitetura do Projeto
 
-### ✅ Arquitetura Limpa e Organizada
-- **Estrutura de Pastas**: Organização lógica por funcionalidade
-- **Componentes Reutilizáveis**: Biblioteca de componentes comuns
-- **Tipagem TypeScript**: Tipos centralizados e bem definidos
-- **Utilitários**: Funções de validação e formatação
-- **Configuração ESLint/Prettier**: Padronização de código
+O projeto agora é composto por duas partes principais:
 
-### ✅ Funcionalidades de Gestão
-- **Cadastro de Motos**: Formulário completo com validações
-- **Lista de Motos**: Visualização com filtros e busca
-- **Detalhes da Moto**: Informações completas e histórico
-- **Edição de Motos**: Atualização de dados existentes
-- **Remoção de Motos**: Exclusão com confirmação
+*   **Frontend**: Aplicativo móvel desenvolvido em **React Native** com **Expo**, utilizando **Firebase Authentication** para o login.
+*   **Backend**: API RESTful desenvolvida em **Java** com **Spring Boot**, utilizando **Spring Data JPA** para persistência de dados em um banco de dados **H2 em memória** (para desenvolvimento) e configurada com **CORS** para permitir comunicação com o frontend.
 
-## 🏗️ Estrutura do Projeto
-
-```
-app/
-├── (tabs)/                 # Telas principais com navegação por abas
-│   ├── index.tsx          # Dashboard/Tela inicial
-│   ├── motos.tsx          # Lista de motos
-│   ├── cadastrarMoto.tsx  # Cadastro de motos
-│   ├── configuracoes.tsx  # Configurações e logout
-│   └── _layout.tsx        # Layout das abas
-├── auth/                  # Telas de autenticação
-│   ├── login.tsx          # Tela de login
-│   ├── register.tsx       # Tela de cadastro
-│   └── _layout.tsx        # Layout de autenticação
-├── components/            # Componentes reutilizáveis
-│   ├── common/            # Componentes comuns
-│   │   ├── LoadingButton.tsx
-│   │   └── CustomInput.tsx
-│   └── AuthNavigator.tsx  # Navegador de autenticação
-├── contexts/              # Contextos React
-│   ├── AuthContext.tsx    # Contexto de autenticação
-│   ├── ThemeContext.tsx   # Contexto de tema
-│   └── MotoContext.tsx    # Contexto de motos
-├── services/              # Serviços e APIs
-│   └── api.ts            # Serviço de API simulada
-├── types/                 # Definições de tipos TypeScript
-│   └── index.ts          # Tipos centralizados
-├── utils/                 # Utilitários
-│   ├── validation.ts      # Funções de validação
-│   └── formatting.ts      # Funções de formatação
-└── _layout.tsx           # Layout raiz da aplicação
+```mermaid
+graph TD
+    A[Usuário] -->|Interage com| B(Aplicativo React Native)
+    B -->|Autenticação via| C(Firebase Auth)
+    B -->|Requisições HTTP para| D(API Java Spring Boot)
+    D -->|Persistência de dados em| E(Banco de Dados H2)
 ```
 
-## 🛠️ Tecnologias Utilizadas
+## Estrutura de Pastas
 
-- **React Native** - Framework para desenvolvimento mobile
-- **Expo** - Plataforma de desenvolvimento e build
-- **TypeScript** - Linguagem com tipagem estática
-- **Expo Router** - Sistema de navegação baseado em arquivos
-- **AsyncStorage** - Armazenamento local persistente
-- **Context API** - Gerenciamento de estado global
-- **ESLint + Prettier** - Padronização e formatação de código
-
-## 📋 Pré-requisitos
-
-- Node.js (versão LTS recomendada)
-- npm ou yarn
-- Expo CLI: `npm install -g @expo/cli`
-- Dispositivo móvel com Expo Go ou emulador configurado
-
-## 🚀 Como Executar o Projeto
-
-### 1. Clone o repositório
-```bash
-git clone https://github.com/GusthavoDaniel/Mottu-VisionTracker.git
-cd Mottu-VisionTracker
+```
+Mottu-VisionTracker2/
+├── app/                     # Frontend React Native
+│   ├── (auth)/              # Telas de autenticação (login, cadastro)
+│   ├── (tabs)/              # Telas principais do aplicativo (motos, alertas, dashboard)
+│   ├── assets/              # Imagens, ícones, fontes
+│   ├── components/          # Componentes reutilizáveis da UI
+│   ├── contexts/            # Contextos React (AuthContext, MotoContext, ThemeContext)
+│   ├── hooks/               # Hooks personalizados
+│   ├── services/            # Serviços de API (Firebase, API Java)
+│   ├── types/               # Definições de tipos TypeScript
+│   ├── App.tsx              # Componente raiz do aplicativo
+│   ├── app.json             # Configurações do Expo
+│   ├── babel.config.js      # Configuração do Babel
+│   ├── tsconfig.json        # Configuração do TypeScript
+│   └── package.json         # Dependências e scripts do frontend
+├── backend/                 # Backend Java Spring Boot
+│   └── mottu-visiontracker-api/
+│       ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/mottu/visiontracker/
+│   │   │   │   ├── config/          # Configurações (CORS, DataInitializer)
+│   │   │   │   ├── controller/      # Controladores REST (MotoController, AlertaController, HealthController)
+│   │   │   │   ├── dto/             # Objetos de Transferência de Dados (MotoDTO, AlertaDTO, ApiResponse)
+│   │   │   │   ├── entity/          # Entidades JPA (Moto, Alerta)
+│   │   │   │   ├── repository/      # Repositórios Spring Data JPA (MotoRepository, AlertaRepository)
+│   │   │   │   ├── service/         # Serviços de lógica de negócio (MotoService, AlertaService)
+│   │   │   │   └── MottuVisionTrackerApplication.java # Classe principal da aplicação
+│   │   │   └── resources/         # Arquivos de recursos (application.properties)
+│   │   └── test/                  # Testes (removido para simplificar)
+│       └── pom.xml                  # Configuração do Maven
+├── .gitignore               # Arquivos e pastas a serem ignorados pelo Git
+└── README.md                # Este arquivo
 ```
 
-### 2. Instale as dependências
-```bash
-npm install
-# ou
-yarn install
-```
+## Como Executar o Projeto
 
-### 3. Inicie o servidor de desenvolvimento
-```bash
-npm start
-# ou
-expo start
-```
+### 1. Backend (API Java Spring Boot)
 
-### 4. Execute no dispositivo
-- **Dispositivo físico**: Escaneie o QR code com o app Expo Go
-- **Emulador Android**: Pressione `a` no terminal
-- **Simulador iOS**: Pressione `i` no terminal (requer macOS)
-- **Web**: Pressione `w` no terminal (para testes rápidos)
+**Pré-requisitos:**
 
-## 🧪 Scripts Disponíveis
+*   Java Development Kit (JDK) 11 ou superior
+*   Apache Maven 3.6 ou superior
 
-```bash
-# Desenvolvimento
-npm start          # Inicia o servidor Expo
-npm run android    # Abre no emulador Android
-npm run ios        # Abre no simulador iOS
-npm run web        # Abre no navegador
+**Passos:**
 
-# Qualidade de código
-npm run lint       # Executa ESLint
-npm run lint:fix   # Corrige problemas do ESLint automaticamente
-npm run format     # Formata código com Prettier
-npm run type-check # Verifica tipos TypeScript
-```
+1.  Navegue até o diretório do backend:
+    ```bash
+    cd Mottu-VisionTracker2/backend/mottu-visiontracker-api
+    ```
+2.  Compile o projeto (isso também baixará as dependências):
+    ```bash
+    mvn clean install
+    ```
+3.  Execute a aplicação Spring Boot:
+    ```bash
+    mvn spring-boot:run
+    ```
+    A API estará disponível em `http://localhost:8080/api`. O console H2 estará disponível em `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:mottu_visiontracker`).
 
-## 🔐 Credenciais de Teste
+**Endpoints da API (Exemplos):**
 
-Para testar o sistema de autenticação, você pode:
+*   `GET /api/health` - Verifica o status da API.
+*   `GET /api/motos` - Lista todas as motos.
+*   `GET /api/motos/{id}` - Busca uma moto por ID.
+*   `POST /api/motos` - Cria uma nova moto.
+*   `PUT /api/motos/{id}` - Atualiza uma moto.
+*   `DELETE /api/motos/{id}` - Remove uma moto.
+*   `GET /api/alertas` - Lista todos os alertas.
+*   `PATCH /api/alertas/{id}/resolve` - Resolve um alerta.
+*   `GET /api/motos/stats` - Estatísticas de motos.
+*   `GET /api/alertas/stats` - Estatísticas de alertas.
 
-1. **Criar uma nova conta** usando a tela de cadastro
-2. **Usar dados de teste** (o sistema simula um backend com AsyncStorage)
+### 2. Frontend (Aplicativo React Native)
 
-### Exemplo de dados para teste:
-- **Email**: `admin@mottu.com`
-- **Senha**: `123456`
+**Pré-requisitos:**
 
-*Nota: Crie esta conta através da tela de cadastro na primeira execução*
+*   Node.js (versão LTS recomendada)
+*   npm ou Yarn
+*   Expo CLI (`npm install -g expo-cli`)
 
-## 📱 Funcionalidades Detalhadas
+**Passos:**
 
-### Sistema de Autenticação
-- Validação de email em tempo real
-- Verificação de força da senha
-- Mensagens de erro contextuais
-- Persistência de sessão
-- Logout seguro
+1.  Navegue até o diretório do frontend:
+    ```bash
+    cd Mottu-VisionTracker2/app
+    ```
+2.  Instale as dependências:
+    ```bash
+    npm install
+    # ou yarn install
+    ```
+3.  Inicie o servidor de desenvolvimento do Expo:
+    ```bash
+    expo start
+    ```
+4.  Use o aplicativo Expo Go no seu celular ou um emulador/simulador para escanear o QR code e abrir o aplicativo.
 
-### Gestão de Motos
-- Cadastro com validação de placa (formato brasileiro)
-- Seleção de modelo, cor e status
-- Campo obrigatório para proprietário
-- Localização automática simulada
-- Histórico de movimentações
+## Integrantes
 
-### Interface Adaptativa
-- Suporte completo a modo escuro/claro
-- Componentes responsivos
-- Indicadores de carregamento
-- Feedback visual para ações do usuário
-- Navegação intuitiva
+*   **Nome:** Gusthavo Daniel
+*   **RM:** [Seu RM aqui]
+*   **GitHub:** [Link para seu perfil GitHub]
 
-## 🎨 Design System
+## Licença
 
-### Cores Principais
-- **Primary**: `#00A859` (Verde Mottu)
-- **Accent**: `#00EF7F` (Verde claro)
-- **Success**: `#4CAF50`
-- **Warning**: `#FFC107`
-- **Error**: `#F44336`
-
-### Tipografia
-- **Títulos**: 24px, peso 700
-- **Subtítulos**: 18px, peso 600
-- **Corpo**: 16px, peso 400
-- **Legendas**: 14px, peso 400
-
-## 🔄 Simulação RFID
-
-O aplicativo simula a integração com sistema RFID através de:
-- Geração automática de localizações
-- Histórico de movimentações
-- Alertas simulados
-- Status de conectividade
-
-## 📊 Métricas de Qualidade
-
-- **Cobertura de Tipos**: 100% TypeScript
-- **Padrão de Código**: ESLint + Prettier
-- **Componentização**: 95% componentes reutilizáveis
-- **Responsividade**: Suporte completo mobile/tablet
-
-## 🚧 Próximas Implementações
-
-- [ ] Integração com backend real
-- [ ] Sistema de notificações push
-- [ ] Mapa interativo do pátio
-- [ ] Relatórios e analytics
-- [ ] Integração com hardware RFID real
-
-## 📄 Licença
-
-Este projeto é um protótipo acadêmico desenvolvido para fins educacionais.
-
----
-
-**Desenvolvido com ❤️ pela equipe Mottu VisionTracker**
-
+Este projeto está licenciado sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.

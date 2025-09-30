@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,43 +18,90 @@ import { useTheme } from '../contexts/ThemeContext';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   
-  const { login } = useAuth();
+  const { login, isLoading, error, clearError } = useAuth();
   const { colors } = useTheme();
   const router = useRouter();
 
-  const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
-      return;
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Erro', error, [{ text: 'OK', onPress: clearError }]);
     }
+  }, [error, clearError]);
 
-    if (!isValidEmail(email)) {
-      Alert.alert('Erro', 'Por favor, insira um email válido.');
-      return;
-    }
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
-    setIsLoading(true);
-    
-    try {
-      const success = await login(email.trim().toLowerCase(), password);
-      
-      if (success) {
-        router.replace('/(tabs)');
-      } else {
-        Alert.alert('Erro', 'Email ou senha incorretos.');
-      }
-    } catch (error) {
-      Alert.alert('Erro', 'Ocorreu um erro durante o login. Tente novamente.');
-    } finally {
-      setIsLoading(false);
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (emailError) setEmailError('');
+    if (error) clearError();
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    if (passwordError) setPasswordError('');
+    if (error) clearError();
+  };
+
+  const handleEmailBlur = () => {
+    setEmailFocused(false);
+    if (email.trim() && !validateEmail(email.trim())) {
+      setEmailError('Formato de email inválido');
     }
   };
 
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  const handlePasswordBlur = () => {
+    setPasswordFocused(false);
+    if (password.trim() && password.length < 6) {
+      setPasswordError('A senha deve ter pelo menos 6 caracteres');
+    }
+  };
+
+  const handleLogin = async () => {
+    if (isLoading) return;
+
+    // Limpar erros anteriores
+    setEmailError('');
+    setPasswordError('');
+    
+    let hasError = false;
+
+    if (!email.trim()) {
+      setEmailError('Email é obrigatório');
+      hasError = true;
+    } else if (!validateEmail(email.trim())) {
+      setEmailError('Formato de email inválido');
+      hasError = true;
+    }
+
+    if (!password.trim()) {
+      setPasswordError('Senha é obrigatória');
+      hasError = true;
+    } else if (password.length < 6) {
+      setPasswordError('A senha deve ter pelo menos 6 caracteres');
+      hasError = true;
+    }
+
+    if (hasError) return;
+    
+    try {
+      const result = await login(email.trim().toLowerCase(), password);
+      
+      if (result.success) {
+        router.replace('/(tabs)');
+      } else if (result.error) {
+        Alert.alert('Erro', result.error);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro durante o login. Tente novamente.');
+    }
   };
 
   const navigateToRegister = () => {
@@ -175,9 +222,15 @@ export default function LoginScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                emailFocused && styles.inputFocused,
+                emailError && styles.inputError
+              ]}
               value={email}
-              onChangeText={setEmail}
+              onChangeText={handleEmailChange}
+              onFocus={() => setEmailFocused(true)}
+              onBlur={handleEmailBlur}
               placeholder="Digite seu email"
               placeholderTextColor={colors.textSecondary}
               keyboardType="email-address"
@@ -185,19 +238,31 @@ export default function LoginScreen() {
               autoCorrect={false}
               editable={!isLoading}
             />
+            {emailError ? (
+              <Text style={styles.errorText}>{emailError}</Text>
+            ) : null}
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Senha</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                passwordFocused && styles.inputFocused,
+                passwordError && styles.inputError
+              ]}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={handlePasswordChange}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={handlePasswordBlur}
               placeholder="Digite sua senha"
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
               editable={!isLoading}
             />
+            {passwordError ? (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            ) : null}
           </View>
 
           <TouchableOpacity
