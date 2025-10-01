@@ -2,55 +2,18 @@
 
 Este projeto consiste em um aplicativo móvel desenvolvido em React Native para rastreamento de motos e uma API de backend em Java com Spring Boot para gerenciar os dados das motos e alertas.
 
+## Integrantes
+
+*   **Nome:** Gusthavo Daniel de Souza - **RM:** [554681]
+    **Nome:** Guilherme Damasio Roselli - **RM:** [555873]
+    **Nome:** Lucas Miranda Leite - **RM:** [555161]
+
+
+*   **GitHub:** [](https://github.com/GusthavoDaniel/Mottu-VisionTracker2)
+
 ## Requisitos da Sprint 3
 
 Esta entrega intermediária do projeto de aplicativo móvel desenvolvido em React Native visa refletir boa parte das funcionalidades planejadas, agora com uma API Java robusta no backend. O protótipo entregue anteriormente foi transformado em uma base concreta de desenvolvimento, com código limpo, integração com a API e interface minimamente refinada.
-
-### Critérios de Avaliação e Pontuação
-
-1.  **Telas funcionais integradas com API (40 pontos)**
-    *   Implementação de funcionalidades completas utilizando a API Java.
-    *   Operações CRUD (Create, Read, Update, Delete) para motos.
-    *   Tratamento completo de formulários: validações, mensagens de erro, feedback ao usuário.
-    *   Indicadores de carregamento em chamadas de rede.
-
-2.  **Sistema de Login (20 pontos)**
-    *   Manutenção do Firebase Authentication para o fluxo de autenticação.
-    *   Validação dos formulários, tratamentos de erros e indicadores de carregamento.
-
-3.  **Estilização com Tema (15 pontos)**
-    *   Suporte a modo claro e modo escuro.
-    *   Personalização visual consistente (cores, fontes, imagens).
-    *   Seguindo guidelines de design (Material Design ou Apple Human Interface Guidelines).
-    *   Criatividade e identidade visual coerente.
-
-4.  **Arquitetura de Código (15 pontos)**
-    *   Organização lógica de arquivos, pastas e componentes.
-    *   Nomenclatura padronizada de variáveis, funções e componentes.
-    *   Separação adequada de responsabilidades (componentes, serviços, estilos, rotas, contextos, etc.).
-    *   Código limpo, legível e bem estruturado.
-    *   Indentação correta e formatação padronizada.
-    *   Uso de boas práticas específicas do desenvolvimento com React Native e Spring Boot.
-    *   Utilização de ferramentas como ESLint, Prettier ou o formatador do editor.
-    *   Bibliotecas utilizadas relevantes, atualizadas e necessárias.
-
-5.  **Documentação e Apresentação (10 pontos)**
-    *   Repositório contendo este arquivo `README.md` com:
-        *   Nome do app
-        *   Proposta e funcionalidades
-        *   Estrutura de pastas
-        *   Nome, RM e GitHub de todos os integrantes
-    *   Gravação de vídeo demonstrando o app em funcionamento real (emulador ou dispositivo), apresentando todas as funcionalidades. (A ser gerado pelo usuário)
-
-### Penalidades
-
-*   Não entregar via GitHub Classroom (-20 pontos)
-*   Não entregar vídeo de apresentação (-20 pontos)
-*   Ausência do arquivo README.md (-10 pontos)
-*   Não utilizar tema (modo claro/escuro) (-20 pontos)
-*   Aplicativo fora do escopo das aulas (-60 pontos)
-*   Remoção de telas entregues na Sprint anterior (-100 pontos)
-*   Histórico do Git incoerente ou confuso (-50 pontos)
 
 ## Arquitetura do Projeto
 
@@ -127,7 +90,7 @@ Mottu-VisionTracker2/
     ```bash
     mvn spring-boot:run
     ```
-    A API estará disponível em `http://localhost:8080/api`. O console H2 estará disponível em `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:mottu_visiontracker`).
+    O console H2 estará disponível em `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:mottu_visiontracker`).
 
 **Endpoints da API (Exemplos):**
 
@@ -166,12 +129,6 @@ Mottu-VisionTracker2/
     expo start
     ```
 4.  Use o aplicativo Expo Go no seu celular ou um emulador/simulador para escanear o QR code e abrir o aplicativo.
-
-## Integrantes
-
-*   **Nome:** Gusthavo Daniel
-*   **RM:** [Seu RM aqui]
-*   **GitHub:** [Link para seu perfil GitHub]
 
 ## Licença
 
