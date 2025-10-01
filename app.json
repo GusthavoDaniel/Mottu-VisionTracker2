@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "meuAppRfid",
-    "slug": "meuAppRfid",
+    "name": "Mottu-VisionTracker",
+    "slug": "mottu-visiontracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,18 +16,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     },
     "plugins": [
       "expo-router",
       "expo-secure-store"
     ],
-    "scheme": "meuapprfid",
+    "scheme": "mottuvisiontracker",
     "sdkVersion": "53.0.0"
   }
 }

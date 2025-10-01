@@ -20,7 +20,7 @@ export default function TabsLayout() {
         headerTintColor: colors.text,
         headerTitleStyle: { color: colors.text },
         tabBarStyle: { backgroundColor: colors.background, borderTopColor: colors.border },
-        headerLeft, // <— seta nas telas das tabs quando há para onde voltar
+        headerLeft, // seta nas telas das tabs quando há para onde voltar
       }}
     >
       <Tabs.Screen
@@ -67,6 +67,7 @@ export default function TabsLayout() {
       />
 
       {/* Telas fora da tab bar */}
+      <Tabs.Screen name="motos" options={{ href: null }} />
       <Tabs.Screen name="cadastrarMoto" options={{ href: null }} />
       <Tabs.Screen name="registrarEventoRfid" options={{ href: null }} />
     </Tabs>
