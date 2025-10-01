@@ -1,18 +1,16 @@
-/**
- * Utilitários de formatação de dados
- */
+
 
 export const formatPlaca = (placa: string): string => {
-  // Remove espaços e converte para maiúsculo
+  
   const cleanPlaca = placa.replace(/\s/g, '').toUpperCase();
   
-  // Formata placa antiga (AAA0000) ou Mercosul (AAA0A00)
+
   if (cleanPlaca.length === 7) {
     if (/^[A-Z]{3}[0-9]{4}$/.test(cleanPlaca)) {
-      // Formato antigo: AAA-0000
+      
       return `${cleanPlaca.slice(0, 3)}-${cleanPlaca.slice(3)}`;
     } else if (/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(cleanPlaca)) {
-      // Formato Mercosul: AAA0A00
+      
       return `${cleanPlaca.slice(0, 3)}${cleanPlaca.slice(3, 4)}${cleanPlaca.slice(4, 5)}${cleanPlaca.slice(5)}`;
     }
   }

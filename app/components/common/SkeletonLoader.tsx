@@ -23,7 +23,7 @@ type ThemeHookReturn = {
 };
 
 export interface SkeletonLoaderProps {
-  /** Aceita número (px) ou porcentagem tipada */
+  
   width?: number | `${number}%`;
   height?: number;
   borderRadius?: number;
@@ -49,7 +49,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
         Animated.timing(animatedValue, {
           toValue: 1,
           duration: 1000,
-          useNativeDriver: false, // backgroundColor não usa driver nativo
+          useNativeDriver: false, 
         }),
         Animated.timing(animatedValue, {
           toValue: 0,
@@ -71,7 +71,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
         })
       : (colors.border ?? '#E5E7EB');
 
-  // Monta um estilo "animável" com tipos aceitos pelo Animated
+  
   const animatedStyle = {
     width,
     height,
@@ -82,7 +82,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   return <Animated.View style={[animatedStyle, style]} />;
 };
 
-// --------- Componentes auxiliares ---------
+
 
 export const SkeletonText: React.FC<{
   lines?: number;

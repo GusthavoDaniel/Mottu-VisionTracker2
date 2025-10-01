@@ -20,7 +20,7 @@ export default function TabsLayout() {
         headerTintColor: colors.text,
         headerTitleStyle: { color: colors.text },
         tabBarStyle: { backgroundColor: colors.background, borderTopColor: colors.border },
-        headerLeft, // seta nas telas das tabs quando há para onde voltar
+        headerLeft, 
       }}
     >
       <Tabs.Screen

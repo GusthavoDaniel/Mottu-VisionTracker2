@@ -4,7 +4,6 @@ import { useLocalSearchParams, Stack, router, useFocusEffect } from 'expo-router
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Motos } from '../services/motos';
 
-// Paleta Mottu
 const MOTTU_BLACK = '#121212';
 const MOTTU_GREEN = '#00EF7F';
 const MOTTU_WHITE = '#FFFFFF';
@@ -34,11 +33,21 @@ export default function MotoDetalhesScreen() {
     if (!id) return;
     try {
       setLoading(true);
-      const m = await Motos.get(Number(id));
 
+      // força id como string
+      const m = await Motos.get(String(id));
+
+      if (!m) {
+        setMoto(null);
+        return;
+      }
+
+      // normaliza id (caso a API retorne string)
+      const idNum = typeof m.id === 'number' ? m.id : Number(m.id);
       const agora = new Date().toLocaleString('pt-BR');
+
       setMoto({
-        id: m.id,
+        id: idNum,
         placa: m.placa,
         modelo: m.modelo,
         status: m.status,

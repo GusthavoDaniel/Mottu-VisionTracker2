@@ -1,4 +1,4 @@
-// app/services/alertas.ts
+
 import { http } from './http';
 
 export type Alerta = {
@@ -13,7 +13,7 @@ export const Alertas = {
     try {
       return await http<Alerta[]>('/alertas');
     } catch (e: any) {
-      if (e?.status === 404) return []; // <- evita quebrar se a rota não existir
+      if (e?.status === 404) return []; 
       throw e;
     }
   },

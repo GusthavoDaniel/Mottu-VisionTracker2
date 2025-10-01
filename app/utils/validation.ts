@@ -1,6 +1,4 @@
-/**
- * Utilitários de validação para formulários
- */
+
 
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -8,7 +6,7 @@ export const validateEmail = (email: string): boolean => {
 };
 
 export const validatePlaca = (placa: string): boolean => {
-  // Validação de placa brasileira (formato antigo e Mercosul)
+  
   const placaAntigaRegex = /^[A-Z]{3}[0-9]{4}$/;
   const placaMercosulRegex = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
   

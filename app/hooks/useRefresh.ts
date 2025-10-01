@@ -2,9 +2,9 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 
 export interface UseRefreshOptions {
   onRefresh: () => Promise<void>;
-  /** Tempo mínimo exibindo o loading (ms) */
+  
   minRefreshTime?: number;
-  /** Tempo mínimo entre refreshes (ms) */
+  
   cooldownTime?: number;
 }
 
@@ -15,7 +15,7 @@ export interface UseRefreshReturn {
   canRefresh: boolean;
 }
 
-/** Hook para um único refresh com tempo mínimo de loading + cooldown */
+
 export const useRefresh = ({
   onRefresh,
   minRefreshTime = 1000,
@@ -24,7 +24,7 @@ export const useRefresh = ({
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null);
 
-  // TIPAGEM CORRETA PARA RN + valor inicial
+  
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const canRefresh = useMemo(() => {
@@ -34,7 +34,7 @@ export const useRefresh = ({
   }, [refreshing, lastRefreshTime, cooldownTime]);
 
   const refresh = useCallback(async () => {
-    // revalida runtime para evitar stale closures
+    
     const now = Date.now();
     const allowed =
       !refreshing && (lastRefreshTime == null || now - lastRefreshTime > cooldownTime);
@@ -65,7 +65,7 @@ export const useRefresh = ({
     }
   }, [onRefresh, refreshing, lastRefreshTime, cooldownTime, minRefreshTime]);
 
-  // Cleanup do timeout ao desmontar
+  
   useEffect(() => {
     return () => {
       if (refreshTimeoutRef.current) {
@@ -78,7 +78,7 @@ export const useRefresh = ({
   return { refreshing, refresh, lastRefreshTime, canRefresh };
 };
 
-/** Hook para orquestrar múltiplos refreshes independentes */
+
 export const useMultipleRefresh = (
   refreshFunctions: Array<{
     key: string;
@@ -126,27 +126,27 @@ export const useMultipleRefresh = (
   return { refreshStates, globalRefreshing, refreshAll, refreshSingle, isRefreshing };
 };
 
-/** Hook para refresh automático com start/stop e proteção contra múltiplos intervals */
+
 export const useAutoRefresh = (
   onRefresh: () => Promise<void>,
-  interval = 30_000, // 30s
+  interval = 30_000, 
   enabled = true,
 ) => {
   const [isActive, setIsActive] = useState(enabled);
 
-  // TIPAGEM CORRETA + valor inicial
+  
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastRefreshRef = useRef<number>(0);
 
   const stopAutoRefresh = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
-      intervalRef.current = null; // ⟵ evita "undefined não atribuível a Timeout"
+      intervalRef.current = null; 
     }
   }, []);
 
   const startAutoRefresh = useCallback(() => {
-    // evita múltiplos intervals
+    
     stopAutoRefresh();
 
     if (!isActive) return;
@@ -175,18 +175,18 @@ export const useAutoRefresh = (
     return stopAutoRefresh;
   }, [isActive, enabled, startAutoRefresh, stopAutoRefresh]);
 
-  // reinicia o intervalo se o "interval" mudar em runtime
+  
   useEffect(() => {
     if (isActive && enabled) {
       startAutoRefresh();
       return stopAutoRefresh;
     }
-  }, [interval]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [interval]); 
 
   return { isActive, toggleAutoRefresh, startAutoRefresh, stopAutoRefresh };
 };
 
-/** Hook para refresh com retry exponencial simples */
+
 export const useRefreshWithRetry = (
   onRefresh: () => Promise<void>,
   maxRetries = 3,
@@ -213,7 +213,7 @@ export const useRefreshWithRetry = (
           throw err;
         }
         setRetryCount(attempt);
-        // backoff linear: delay * attempt
+        
         await new Promise((res) => setTimeout(res, retryDelay * attempt));
       }
     }

@@ -3,7 +3,7 @@ import { useColorScheme } from 'react-native';
 
 export interface ThemeColors {
   background: string;
-  surface: string;        // 👈 adicionado
+  surface: string;        
   text: string;
   textSecondary: string;
   primary: string;
@@ -31,7 +31,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   const colors = useMemo<ThemeColors>(() => ({
     background: isDark ? '#121212' : '#FFFFFF',
-    surface:    isDark ? '#1E1E1E' : '#F5F5F5',   // 👈 base para inputs/cards
+    surface:    isDark ? '#1E1E1E' : '#F5F5F5',   
     text:       isDark ? '#FFFFFF' : '#121212',
     textSecondary: isDark ? '#BBBBBB' : '#666666',
     primary: '#00A859',

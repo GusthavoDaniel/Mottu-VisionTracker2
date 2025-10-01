@@ -1,4 +1,4 @@
-// contexts/AuthContext.tsx
+
 import React, {
   createContext,
   useContext,
@@ -25,12 +25,12 @@ interface AuthContextProps {
   isAuthenticated: boolean;
   clearError: () => void;
 
-  // ações
+  
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
 
-  // utilitário opcional (quando você quiser setar sessão manualmente)
+  
   setSession: (u: User | null) => Promise<void>;
 }
 
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
 
   const clearError = () => setError(null);
 
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!validateEmail(e)) return { success: false, error: 'Formato de email inválido' };
       if (!p) return { success: false, error: 'Senha é obrigatória' };
 
-      // 1) tenta API
+      
       const api = await ApiService.login(e, p);
       if (api.success && api.data) {
         const u: User = {
@@ -117,7 +117,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { success: true };
       }
 
-      // 2) fallback local (dev)
+      
       const usersData = await AsyncStorage.getItem('@users');
       const users = usersData ? JSON.parse(usersData) : [];
       const found = users.find((u: any) => u.email === e && u.password === p);
@@ -154,7 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const pass = validatePassword(p);
       if (!pass.isValid) return { success: false, error: pass.message };
 
-      // 1) tenta API
+      
       const api = await ApiService.register(n, e, p);
       if (api.success && api.data) {
         const u: User = {
@@ -167,7 +167,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { success: true };
       }
 
-      // 2) fallback local (dev)
+      
       const usersData = await AsyncStorage.getItem('@users');
       const users = usersData ? JSON.parse(usersData) : [];
       if (users.find((u: any) => u.email === e)) {
@@ -194,16 +194,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
 
     try {
-      // tenta API (se existir endpoint)
+      
       try { await ApiService.logout(); } catch (e) { /* ignora erro de rede */ }
-      // limpa sessão local
+      
       await setSession(null);
       setError(null);
 
     } finally {
 
       setIsLoading(false);
-      // redireciona para login
+      
       router.replace('/auth/login');
     }
   };

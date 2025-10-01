@@ -16,7 +16,7 @@ import useThemeColors from '../hooks/useThemeColors';
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.9;
 
-// Interface para filial
+
 interface Filial {
   id: string;
   nome: string;
@@ -223,7 +223,7 @@ export default function GerenciamentoFiliaisScreen() {
     );
   };
 
-  // Renderiza detalhes da filial selecionada
+  
   const renderFilialDetalhes = () => {
     if (!filialSelecionada) return null;
     

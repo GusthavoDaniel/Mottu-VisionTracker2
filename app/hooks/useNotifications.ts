@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import * as Notifications from 'expo-notifications';
-// ❌ remove: import { Subscription } from 'expo-notifications';
 import notificationService from '../services/notificationService';
 
 export interface UseNotificationsReturn {
@@ -26,13 +25,13 @@ export const useNotifications = (): UseNotificationsReturn => {
 
     setupNotifications();
 
-    // Recebida em foreground
+    
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
         console.log('Notificação recebida:', notification);
       });
 
-    // Usuário tocou na notificação
+    
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         console.log('Resposta da notificação:', response);

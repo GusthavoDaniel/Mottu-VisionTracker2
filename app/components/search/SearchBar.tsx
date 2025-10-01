@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   TextInput,
@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useThemeColors } from '../../hooks/useThemeColors';
+import useThemeColors from '../../hooks/useThemeColors';
 
 export interface SearchBarProps {
   placeholder?: string;
@@ -35,9 +35,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   autoFocus = false,
   editable = true,
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors(); // <-- pega somente 'colors'
   const [isFocused, setIsFocused] = useState(false);
-  const animatedWidth = new Animated.Value(width - 32);
+
+  // mantém o Animated.Value entre renders
+  const animatedWidth = useRef(new Animated.Value(width - 32)).current;
 
   useEffect(() => {
     Animated.timing(animatedWidth, {
@@ -45,24 +47,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       duration: 200,
       useNativeDriver: false,
     }).start();
-  }, [isFocused, showFilter]);
+  }, [isFocused, showFilter, animatedWidth]);
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
 
   const handleClear = () => {
     onChangeText('');
     onClear?.();
   };
 
-  const handleSearch = () => {
-    onSearch?.(value);
-  };
+  const handleSearch = () => onSearch?.(value);
 
   const styles = StyleSheet.create({
     container: {
@@ -79,39 +74,28 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       paddingHorizontal: 16,
       paddingVertical: 12,
       borderWidth: 1,
-      borderColor: isFocused ? colors.primary : colors.border,
-      shadowColor: colors.shadow,
-      shadowOffset: {
-        width: 0,
-        height: 1,
-      },
+      borderColor: isFocused ? colors.accent : colors.border, // accent no foco
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.1,
       shadowRadius: 2,
       elevation: 2,
     },
-    searchIcon: {
-      marginRight: 8,
-    },
+    searchIcon: { marginRight: 8 },
     textInput: {
       flex: 1,
       fontSize: 16,
       color: colors.text,
       paddingVertical: 0,
     },
-    clearButton: {
-      marginLeft: 8,
-      padding: 4,
-    },
+    clearButton: { marginLeft: 8, padding: 4 },
     filterButton: {
       marginLeft: 12,
-      backgroundColor: colors.primary,
+      backgroundColor: colors.accent, // accent no botão de filtro
       borderRadius: 20,
       padding: 12,
-      shadowColor: colors.shadow,
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 3,
       elevation: 3,
@@ -127,7 +111,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           color={colors.textSecondary}
           style={styles.searchIcon}
         />
-        
+
         <TextInput
           style={styles.textInput}
           placeholder={placeholder}
@@ -148,11 +132,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             onPress={handleClear}
             activeOpacity={0.7}
           >
-            <Ionicons
-              name="close-circle"
-              size={20}
-              color={colors.textSecondary}
-            />
+            <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         )}
       </Animated.View>
@@ -171,4 +151,3 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 };
 
 export default SearchBar;
-

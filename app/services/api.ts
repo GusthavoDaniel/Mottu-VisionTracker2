@@ -1,8 +1,8 @@
-// services/api.ts
+
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
-// Tipos de dados
+
 export interface Moto {
   id: string;
   placa: string;
@@ -39,56 +39,53 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
-/* =========================
-   BASE URL dinâmico
-   ========================= */
 
-/** Pega o IP do Metro/Expo para device físico. */
+
+
+
 function getLanIPFromExpo(): string | null {
-  // SDKs mais novos: expoConfig.hostUri
-  // SDKs antigos: manifest.debuggerHost
+  
+  
   const hostUri =
     (Constants as any).expoConfig?.hostUri ??
     (Constants as any).manifest?.debuggerHost ??
     '';
   if (!hostUri) return null;
 
-  const host = hostUri.split(':')[0]; // "192.168.x.y:8081" -> "192.168.x.y"
+  const host = hostUri.split(':')[0]; 
   if (!host || host === 'localhost' || host === '127.0.0.1') return null;
   return host;
 }
 
-/** Retorna a base URL apropriada para DEV/PROD. */
+
 function getBaseURL() {
-  // 1) Se houver variável de ambiente, ela manda (ex.: EXPO_PUBLIC_API_URL=https://foo.com/api)
+  
   const envUrl =
     (process.env.EXPO_PUBLIC_API_URL as string | undefined) ||
     (Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL as string | undefined);
-  if (envUrl) return envUrl.replace(/\/+$/, ''); // remove trailing /
+  if (envUrl) return envUrl.replace(/\/+$/, ''); 
 
-  // 2) DEV - Nova API Java Spring Boot
+  
   if (__DEV__) {
     if (Platform.OS === 'android') {
-      // Emulador Android (AVD)
+     
       return 'http://10.0.2.2:8080/api';
     }
-    // Device físico (ou dev build) via Expo
+    
     const lan = getLanIPFromExpo();
     if (lan) return `http://${lan}:8080/api`;
 
-    // Simulador iOS
+    
     return 'http://localhost:8080/api';
   }
 
-  // 3) PROD - API Java Spring Boot
+  
   return 'https://mottu-visiontracker-api-production.up.railway.app/api';
 }
 
 const API_BASE_URL = getBaseURL();
 
-/* =========================
-   Helpers
-   ========================= */
+
 
 const toMoto = (m: any): Moto => ({
   id: String(m.id),
@@ -106,7 +103,7 @@ const toMoto = (m: any): Moto => ({
   updatedAt: String(m.updatedAt),
 });
 
-// Helper para mapear status da API Java para o frontend
+
 const mapStatusFromJava = (status: string): Moto['status'] => {
   switch (status?.toUpperCase()) {
     case 'ATIVA': return 'ativa';
@@ -116,7 +113,7 @@ const mapStatusFromJava = (status: string): Moto['status'] => {
   }
 };
 
-// Helper para mapear status do frontend para a API Java
+
 const mapStatusToJava = (status: Moto['status']): string => {
   switch (status) {
     case 'ativa': return 'ATIVA';
@@ -126,7 +123,7 @@ const mapStatusToJava = (status: Moto['status']): string => {
   }
 };
 
-/** Tenta parsear JSON; se falhar, retorna null. */
+
 async function safeJson(res: Response) {
   try {
     const text = await res.text();
@@ -137,9 +134,7 @@ async function safeJson(res: Response) {
   }
 }
 
-/* =========================
-   Serviço
-   ========================= */
+
 
 class ApiService {
   private static instance: ApiService;
@@ -176,7 +171,7 @@ class ApiService {
         };
       }
 
-      // Suporte para { success, data, message } ou corpo puro
+      
       if (data && typeof data === 'object' && 'success' in data) {
         return data as ApiResponse<T>;
       }
@@ -189,7 +184,7 @@ class ApiService {
     }
   }
 
-  // ===== Autenticação =====
+  
   async login(email: string, senha: string): Promise<ApiResponse<any>> {
     return this.makeRequest('/auth/login', {
       method: 'POST',
@@ -212,11 +207,11 @@ class ApiService {
     return this.makeRequest('/auth/logout', { method: 'POST' });
   }
 
-  // ===== Motos =====
+ 
   async getMotos(): Promise<ApiResponse<Moto[]>> {
     const resp = await this.makeRequest<any>('/motos');
     if (resp.success && resp.data) {
-      // API Java retorna array direto no campo data
+      
       const motosRaw = Array.isArray(resp.data) ? resp.data : [resp.data];
       const motos: Moto[] = motosRaw.map(toMoto);
       return {
@@ -282,7 +277,7 @@ class ApiService {
       posicao: motoData.localizacao?.posicao,
     };
 
-    // Remove campos undefined
+    
     Object.keys(motoJava).forEach(key => 
       motoJava[key as keyof typeof motoJava] === undefined && delete motoJava[key as keyof typeof motoJava]
     );
@@ -307,9 +302,9 @@ class ApiService {
     return this.makeRequest(`/motos/${id}`, { method: 'DELETE' });
   }
 
-  // ===== Dashboard =====
+  
   async getDashboardData(): Promise<ApiResponse<any>> {
-    // Buscar estatísticas das motos e alertas
+    
     try {
       const [motosResp, alertasResp] = await Promise.all([
         this.makeRequest('/motos/stats'),
@@ -335,11 +330,11 @@ class ApiService {
     }
   }
 
-  // ===== Alertas =====
+  
   async getAlertas(): Promise<ApiResponse<Alerta[]>> {
     const resp = await this.makeRequest<any>('/alertas');
     if (resp.success && resp.data) {
-      // API Java retorna array direto no campo data
+      
       const alertasRaw = Array.isArray(resp.data) ? resp.data : [resp.data];
       const alertas: Alerta[] = alertasRaw.map(
         (alerta: any): Alerta => ({
@@ -367,7 +362,7 @@ class ApiService {
       'MANUTENCAO_NECESSARIA': 'manutencao_necessaria',
       'BATERIA_BAIXA': 'bateria_baixa',
       'FORA_DA_AREA': 'fora_da_area',
-      'SEM_LEITURA': 'movimento_nao_autorizado', // Mapear para movimento não autorizado
+      'SEM_LEITURA': 'movimento_nao_autorizado', 
     };
     return mapeamento[tipo] || 'movimento_nao_autorizado';
   }
@@ -396,12 +391,12 @@ class ApiService {
     return resp as ApiResponse<Alerta>;
   }
 
-  // ===== Filiais =====
+  
   async getFiliais(): Promise<ApiResponse<any[]>> {
     return this.makeRequest('/filiais');
   }
 
-  // ===== Health =====
+  
   async healthCheck(): Promise<ApiResponse<any>> {
     return this.makeRequest('/health');
   }

@@ -19,7 +19,7 @@ export const useStorage = <T>(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Carregar dados iniciais
+  
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
@@ -34,7 +34,7 @@ export const useStorage = <T>(
     }
   }, [key, defaultValue, secure]);
 
-  // Salvar dados
+  
   const setData = useCallback(async (value: T, options?: StorageOptions): Promise<boolean> => {
     try {
       setError(null);
@@ -49,7 +49,7 @@ export const useStorage = <T>(
     }
   }, [key]);
 
-  // Remover dados
+  
   const removeData = useCallback(async (): Promise<boolean> => {
     try {
       setError(null);
@@ -64,7 +64,7 @@ export const useStorage = <T>(
     }
   }, [key, defaultValue, secure]);
 
-  // Atualizar dados
+  
   const refresh = useCallback(async () => {
     await loadData();
   }, [loadData]);
@@ -83,37 +83,37 @@ export const useStorage = <T>(
   };
 };
 
-// Hook específico para dados do usuário
+
 export const useUserData = () => {
   return useStorage(STORAGE_KEYS.USER_DATA, null, true);
 };
 
-// Hook específico para token de autenticação
+
 export const useAuthToken = () => {
   return useStorage(STORAGE_KEYS.USER_TOKEN, null, true);
 };
 
-// Hook específico para preferências de tema
+
 export const useThemePreference = () => {
   return useStorage<'light' | 'dark' | 'system'>(STORAGE_KEYS.THEME_MODE, 'system');
 };
 
-// Hook específico para configurações de notificação
+
 export const useNotificationSettings = () => {
   return useStorage(STORAGE_KEYS.NOTIFICATIONS_ENABLED, true);
 };
 
-// Hook específico para cache de motos
+
 export const useMotosCache = () => {
   return useStorage(STORAGE_KEYS.MOTOS_CACHE, [], false);
 };
 
-// Hook específico para histórico de busca
+
 export const useSearchHistory = () => {
   return useStorage<string[]>(STORAGE_KEYS.SEARCH_HISTORY, []);
 };
 
-// Hook específico para preferências de filtro
+
 export const useFilterPreferences = () => {
   return useStorage(STORAGE_KEYS.FILTER_PREFERENCES, {
     status: [],
@@ -124,7 +124,7 @@ export const useFilterPreferences = () => {
   });
 };
 
-// Hook para gerenciar múltiplos storages
+
 export const useMultipleStorage = <T extends Record<string, any>>(
   keys: Array<keyof T>,
   secure: boolean = false
@@ -174,7 +174,7 @@ export const useMultipleStorage = <T extends Record<string, any>>(
   };
 };
 
-// Hook para informações do storage
+
 export const useStorageInfo = () => {
   const [info, setInfo] = useState({
     totalKeys: 0,
@@ -197,7 +197,7 @@ export const useStorageInfo = () => {
 
   const cleanExpiredData = useCallback(async () => {
     await storageService.cleanExpiredData();
-    await loadInfo(); // Recarregar informações após limpeza
+    await loadInfo(); 
   }, [loadInfo]);
 
   useEffect(() => {

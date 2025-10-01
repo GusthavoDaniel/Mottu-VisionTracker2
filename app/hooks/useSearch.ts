@@ -17,7 +17,7 @@ export interface UseSearchReturn {
 
 const defaultFilters: FilterOptions = {
   status: [],
-  filial: [],   // segue existindo no modal; mapeamos para localizacao.setor
+  filial: [],   
   modelo: [],
   sortBy: 'placa',
   sortOrder: 'asc',
@@ -36,14 +36,14 @@ export const useSearch = (data: Moto[]): UseSearchReturn => {
       .replace(/[\u0300-\u036f]/g, '');
   }, []);
 
-  // helper para “filial” (mapeia para setor, se existir)
+  
   const getFilial = useCallback((item: Moto): string => {
-    // se algum dia o backend passar `filial`, priorizamos; senão usamos setor
+    
     // @ts-expect-error compat future
     return (item.filial as string | undefined) ?? item.localizacao?.setor ?? '';
   }, []);
 
-  // campos usados na busca textual
+  
   const matchesSearch = useCallback(
     (item: Moto, query: string): boolean => {
       if (!query.trim()) return true;
@@ -64,21 +64,21 @@ export const useSearch = (data: Moto[]): UseSearchReturn => {
     [normalizeText, getFilial],
   );
 
-  // filtros
+  
   const matchesFilters = useCallback(
     (item: Moto): boolean => {
-      // status
+      
       if (filters.status.length > 0 && !filters.status.includes(item.status)) {
         return false;
       }
 
-      // filial (mapeia para setor)
+      
       const filial = getFilial(item);
       if (filters.filial.length > 0 && !filters.filial.includes(filial)) {
         return false;
       }
 
-      // modelo
+      
       if (filters.modelo.length > 0 && !filters.modelo.includes(item.modelo)) {
         return false;
       }
@@ -88,7 +88,7 @@ export const useSearch = (data: Moto[]): UseSearchReturn => {
     [filters, getFilial],
   );
 
-  // ordenação
+  
   const sortData = useCallback(
     (arr: Moto[]): Moto[] => {
       return [...arr].sort((a, b) => {
@@ -108,7 +108,7 @@ export const useSearch = (data: Moto[]): UseSearchReturn => {
             aValue = a.proprietario;
             bValue = b.proprietario;
             break;
-          case 'created_at': // compat com UI: usa createdAt do tipo
+          case 'created_at': 
           case 'createdAt':
             aValue = new Date((a as any).createdAt || 0).getTime();
             bValue = new Date((b as any).createdAt || 0).getTime();
@@ -133,7 +133,7 @@ export const useSearch = (data: Moto[]): UseSearchReturn => {
     [filters.sortBy, filters.sortOrder, normalizeText],
   );
 
-  // aplica busca + filtros + ordenação
+  
   const filteredData = useMemo(() => {
     const result = data.filter(
       (item) => matchesSearch(item, searchQuery) && matchesFilters(item),
@@ -155,7 +155,7 @@ export const useSearch = (data: Moto[]): UseSearchReturn => {
     setFilters(defaultFilters);
   }, []);
 
-  // histórico de busca
+  
   const addToSearchHistory = useCallback((query: string) => {
     const q = query.trim();
     if (!q) return;

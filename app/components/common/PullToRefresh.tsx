@@ -28,7 +28,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
   children,
   ...scrollViewProps
 }) => {
-  // O hook retorna { colors, isDark }, então extraímos as cores
+  
   const { colors } = useThemeColors() as ThemeHookReturn;
 
   const [internalRefreshing, setInternalRefreshing] = useState(false);
@@ -53,10 +53,10 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
         <RefreshControl
           refreshing={!!isRefreshing}
           onRefresh={handleRefresh}
-          // Android
+          
           colors={[colors.primary]}
           progressBackgroundColor={colors.surface ?? colors.background}
-          // iOS
+          
           tintColor={colors.primary}
           title="Atualizando..."
           titleColor={colors.textSecondary ?? colors.text}

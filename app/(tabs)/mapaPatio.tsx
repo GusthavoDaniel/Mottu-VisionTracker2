@@ -40,10 +40,10 @@ export default function MapaPatioScreen() {
   const router = useRouter();
   const { colors } = useThemeColors();
 
-  // toggle Mapa | Lista
+  
   const [view, setView] = useState<'mapa' | 'lista'>('mapa');
 
-  // estado da lista (API)
+  
   const [motosApi, setMotosApi] = useState<MotoAPI[]>([]);
   const [q, setQ] = useState('');
   const [refreshing, setRefreshing] = useState(false);
@@ -57,7 +57,7 @@ export default function MapaPatioScreen() {
     }
   };
 
-  // DRAG no mapa (context)
+  
   useEffect(() => {
     motos.forEach((moto) => {
       if (!panResponders.current[moto.id]) {
@@ -80,7 +80,7 @@ export default function MapaPatioScreen() {
     });
   }, [motos, moverMoto]);
 
-  // carregar lista da API
+ 
   const loadList = useCallback(async () => {
     setLoadingList(true);
     try {
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', paddingTop: 20 },
   title: { fontSize: 20, marginBottom: 10, fontWeight: 'bold' },
 
-  // MAPA
+  
   patio: {
     width: PATIO_WIDTH,
     height: PATIO_HEIGHT,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 
-  // TOGGLE
+  
   toggleRow: {
     flexDirection: 'row',
     gap: 8,
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   toggleText: { fontWeight: '700' },
 
-  // LISTA
+  
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   },
   itemTitle: { fontSize: 16, fontWeight: '700' },
 
-  // BOTÃO CADASTRO
+  
   botaoCadastro: {
     marginTop: 20,
     paddingVertical: 12,

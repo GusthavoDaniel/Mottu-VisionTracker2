@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useFocusEffect, router } from 'expo-router';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { Motos, Moto } from '../services/motos';         
+import { Motos, Moto } from '../services/motos';
 import useThemeColors from '../hooks/useThemeColors';
 
 export default function MotosList() {
@@ -50,9 +50,10 @@ export default function MotosList() {
     );
   }, [q, data]);
 
-  const remove = async (id: number) => {
-    // confirmação simplificada (pode deixar seu Alert se preferir)
-    await Motos.remove(id);
+  // ---- FIX: service espera string -> normalizamos para string
+  const remove = async (id: string | number) => {
+    const strId = String(id);
+    await Motos.remove(strId);
     load();
   };
 
@@ -86,7 +87,7 @@ export default function MotosList() {
       </View>
 
       {/* Lista */}
-      <FlatList
+      <FlatList<Moto>
         data={filtered}
         keyExtractor={(i) => String(i.id)}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
@@ -116,12 +117,8 @@ export default function MotosList() {
               </View>
 
               <View style={{ flex: 1 }}>
-                <Text style={[styles.title, { color: colors.text }]}>
-                  {item.placa || '—'}
-                </Text>
-                <Text style={{ color: colors.textSecondary }}>
-                  {item.modelo || '—'}
-                </Text>
+                <Text style={[styles.title, { color: colors.text }]}>{item.placa || '—'}</Text>
+                <Text style={{ color: colors.textSecondary }}>{item.modelo || '—'}</Text>
               </View>
 
               <StatusBadge status={item.status as any} colors={colors} />
@@ -165,7 +162,7 @@ function StatusBadge({
   colors,
 }: {
   status?: string;
-  colors: { [k: string]: string };
+  colors: Record<string, string>;
 }) {
   const meta = (() => {
     switch ((status || '').toUpperCase()) {

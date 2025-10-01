@@ -17,7 +17,7 @@ export default function RootLayout() {
               headerStyle: { backgroundColor: colors.background },
               headerTintColor: colors.text,
               headerTitleStyle: { color: colors.text },
-              headerLeft: () => <BackButton />, // <— seta em todas as telas do Stack
+              headerLeft: () => <BackButton />, 
             }}
           >
             {/* Grupo de abas sem header do Stack */}

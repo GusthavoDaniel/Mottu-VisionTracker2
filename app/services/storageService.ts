@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 
 export interface StorageOptions {
   secure?: boolean;
-  expiration?: number; // em milissegundos
+  expiration?: number; 
 }
 
 export interface StoredData<T = any> {
@@ -24,7 +24,7 @@ class StorageService {
     return StorageService.instance;
   }
 
-  // Armazenar dados
+ 
   async setItem<T>(
     key: string,
     value: T,
@@ -53,7 +53,7 @@ class StorageService {
     }
   }
 
-  // Recuperar dados
+  
   async getItem<T>(key: string, secure: boolean = false): Promise<T | null> {
     try {
       if (this.cache.has(key)) {
@@ -92,7 +92,7 @@ class StorageService {
     }
   }
 
-  // Remover item
+  
   async removeItem(key: string, secure: boolean = false): Promise<boolean> {
     try {
       if (secure && Platform.OS !== 'web') {
@@ -108,7 +108,7 @@ class StorageService {
     }
   }
 
-  // Verificar se um item existe
+  
   async hasItem(key: string, secure: boolean = false): Promise<boolean> {
     try {
       const value = await this.getItem(key, secure);
@@ -119,7 +119,7 @@ class StorageService {
     }
   }
 
-  // Limpar todos os dados
+  
   async clear(): Promise<boolean> {
     try {
       await AsyncStorage.clear();
@@ -131,18 +131,18 @@ class StorageService {
     }
   }
 
-  // ✅ Obter todas as chaves (corrigido)
+  
   async getAllKeys(): Promise<string[]> {
     try {
-      const keys = await AsyncStorage.getAllKeys(); // retorna readonly string[]
-      return [...keys]; // transforma em string[]
+      const keys = await AsyncStorage.getAllKeys(); 
+      return [...keys]; 
     } catch (error) {
       console.error('Erro ao obter chaves:', error);
       return [];
     }
   }
 
-  // Armazenar múltiplos itens
+  
   async setMultiple(items: Array<[string, any, StorageOptions?]>): Promise<boolean> {
     try {
       const promises = items.map(([key, value, options]) =>
@@ -156,7 +156,7 @@ class StorageService {
     }
   }
 
-  // Recuperar múltiplos itens
+  
   async getMultiple<T>(keys: string[], secure: boolean = false): Promise<Record<string, T | null>> {
     try {
       const promises = keys.map(async (key) => {
@@ -171,13 +171,13 @@ class StorageService {
     }
   }
 
-  // Validar expiração
+  
   private isDataValid<T>(storedData: StoredData<T>): boolean {
     if (!storedData.expiration) return true;
     return Date.now() < storedData.expiration;
   }
 
-  // Limpar dados expirados
+  
   async cleanExpiredData(): Promise<void> {
     try {
       const keys = await this.getAllKeys();
@@ -198,7 +198,7 @@ class StorageService {
     }
   }
 
-  // Info do storage
+  
   async getStorageInfo(): Promise<{
     totalKeys: number;
     cacheSize: number;
@@ -268,7 +268,7 @@ class StorageService {
   }
 }
 
-// Chaves padrão do app
+
 export const STORAGE_KEYS = {
   USER_TOKEN: 'user_token',
   USER_DATA: 'user_data',

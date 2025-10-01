@@ -1,4 +1,4 @@
-// app/services/motos.ts
+
 import Api, { Moto as ApiMoto } from './api';
 export type Moto = ApiMoto;
 

@@ -1,4 +1,4 @@
-// Tipos de dados principais
+
 export interface User {
   id: string;
   name: string;
@@ -30,7 +30,7 @@ export interface Alerta {
   resolvido: boolean;
 }
 
-// Tipos para API
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -38,7 +38,7 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
-// Tipos para contextos
+
 export interface ThemeColors {
   background: string;
   text: string;
@@ -67,7 +67,7 @@ export interface AuthContextProps {
   isAuthenticated: boolean;
 }
 
-// Tipos para formulários
+
 export interface LoginFormData {
   email: string;
   password: string;
@@ -88,7 +88,7 @@ export interface MotoFormData {
   status: 'ativa' | 'manutencao' | 'inativa';
 }
 
-// Tipos para componentes
+
 export interface LoadingButtonProps {
   title: string;
   onPress: () => void;
@@ -111,7 +111,7 @@ export interface CustomPickerProps {
   disabled?: boolean;
 }
 
-// Constantes
+
 export const MODELOS_MOTOS = ['CG 160', 'Factor 125', 'Biz 125', 'PCX 150', 'CB 600F'] as const;
 export const CORES_MOTOS = ['Preta', 'Verde Mottu', 'Branca', 'Vermelha', 'Azul'] as const;
 export const STATUS_MOTOS = ['ativa', 'manutencao', 'inativa'] as const;

@@ -12,8 +12,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useMotoContext } from '../contexts/MotoContext';     // <- caminho corrigido
-import { useTheme } from '../contexts/ThemeContext';          // <- caminho corrigido
+import { useMotoContext } from '../contexts/MotoContext';     
+import { useTheme } from '../contexts/ThemeContext';          
 
 const MODELOS_MOTOS = ['CG 160', 'Factor 125', 'Biz 125', 'PCX 150', 'CB 600F'] as const;
 const CORES_MOTOS   = ['Preta', 'Verde Mottu', 'Branca', 'Vermelha', 'Azul'] as const;
@@ -49,7 +49,7 @@ export default function CadastrarMotoScreen() {
     if (!proprietario.trim()) { Alert.alert('Erro', 'Por favor, insira o nome do proprietário'); return false; }
     if (proprietario.trim().length < 2) { Alert.alert('Erro', 'O nome do proprietário deve ter pelo menos 2 caracteres'); return false; }
 
-    // AAA0000 (antiga) ou AAA0A00 (Mercosul)
+    
     const placaAntigaRegex = /^[A-Z]{3}[0-9]{4}$/;
     const placaMercosulRegex = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
     if (!placaAntigaRegex.test(placaSanitizada) && !placaMercosulRegex.test(placaSanitizada)) {
@@ -63,7 +63,7 @@ export default function CadastrarMotoScreen() {
     if (isLoading) return;
     if (!validarFormulario()) return;
 
-    // mapeia status para o formato do backend (ATIVA/MANUTENCAO)
+    
     const statusApi = status === 'manutencao' ? 'MANUTENCAO' : 'ATIVA';
 
     const sucesso = await adicionarMoto({

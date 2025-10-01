@@ -1,14 +1,14 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
-// Configuração das notificações
+
 Notifications.setNotificationHandler({
   handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
-    shouldShowBanner: true, // ✅ necessário no iOS
-    shouldShowList: true,   // ✅ necessário no iOS
+    shouldShowBanner: true, 
+    shouldShowList: true,   
   }),
 });
 
@@ -29,7 +29,7 @@ class NotificationService {
     return NotificationService.instance;
   }
 
-  // Solicitar permissões de notificação
+  
   async requestPermissions(): Promise<boolean> {
     try {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -45,7 +45,7 @@ class NotificationService {
         return false;
       }
 
-      // Configurar canal de notificação para Android
+      
       if (Platform.OS === 'android') {
         await Notifications.setNotificationChannelAsync('default', {
           name: 'Mottu VisionTracker',
@@ -62,7 +62,7 @@ class NotificationService {
     }
   }
 
-  // Mostrar notificação local imediata
+  
   async showNotification(notification: NotificationData): Promise<string | null> {
     try {
       const hasPermission = await this.requestPermissions();
@@ -85,7 +85,7 @@ class NotificationService {
     }
   }
 
-  // Agendar notificação
+  
   async scheduleNotification(
     notification: NotificationData,
     trigger: Notifications.NotificationTriggerInput
@@ -111,7 +111,7 @@ class NotificationService {
     }
   }
 
-  // Cancelar notificação específica
+  
   async cancelNotification(notificationId: string): Promise<void> {
     try {
       await Notifications.cancelScheduledNotificationAsync(notificationId);
@@ -120,7 +120,7 @@ class NotificationService {
     }
   }
 
-  // Cancelar todas
+  
   async cancelAllNotifications(): Promise<void> {
     try {
       await Notifications.cancelAllScheduledNotificationsAsync();
@@ -129,7 +129,7 @@ class NotificationService {
     }
   }
 
-  // Notificações específicas
+  
   async notifyMotoCreated(moto: { placa: string; modelo: string }): Promise<void> {
     await this.showNotification({
       title: '🏍️ Moto Cadastrada!',
@@ -200,7 +200,7 @@ class NotificationService {
     });
   }
 
-  // Categorias
+  
   async setupNotificationCategories(): Promise<void> {
     try {
       await Notifications.setNotificationCategoryAsync('moto_actions', [
@@ -231,11 +231,11 @@ class NotificationService {
     }
   }
 
-  // Token push
+  
   async getPushToken(): Promise<string | null> {
     try {
       const token = await Notifications.getExpoPushTokenAsync({
-        projectId: 'your-project-id', // 🔴 substitua pelo seu projectId
+        projectId: 'your-project-id', 
       });
       return token.data;
     } catch (error) {
@@ -244,7 +244,7 @@ class NotificationService {
     }
   }
 
-  // Limpar badge
+  
   async clearBadge(): Promise<void> {
     try {
       await Notifications.setBadgeCountAsync(0);

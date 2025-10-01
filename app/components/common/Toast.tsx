@@ -27,11 +27,11 @@ export interface ToastProps {
   message: string;
   variant?: ToastVariant;
   style?: StyleProp<ViewStyle>;
-  /** Ícone opcional que você estiver usando no app (Ionicons, etc.) */
+  
   iconName?: string;
 }
 
-/** Configura cores por variante com fallbacks */
+
 const getToastColors = (variant: ToastVariant, colors: ThemeColors) => {
   switch (variant) {
     case 'success':
@@ -68,7 +68,7 @@ const Toast: React.FC<ToastProps> = ({
   style,
   iconName,
 }) => {
-  // ✅ o hook retorna { colors, isDark }
+  
   const { colors } = useThemeColors() as ThemeHookReturn;
 
   const { backgroundColor } = getToastColors(variant, colors);
@@ -76,7 +76,7 @@ const Toast: React.FC<ToastProps> = ({
   return (
     <View style={[styles.container, { backgroundColor }, style]}>
       {/* Coloque aqui seu componente de ícone se quiser, ex:
-          <Ionicons name={iconName ?? defaultIcon(variant)} size={18} color={iconColor} />
+          
        */}
       <Text style={[styles.text, { color: colors.text ?? '#FFFFFF' }]} numberOfLines={2}>
         {message}

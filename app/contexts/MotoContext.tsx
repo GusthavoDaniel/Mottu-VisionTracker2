@@ -63,7 +63,7 @@ export const MotoProvider = ({ children }: { children: ReactNode }) => {
 
   const clearError = () => setError(null);
 
-  // normaliza status vindo do JSON-server (ATIVA / MANUTENCAO / INATIVA)
+  
   const normalizeStatus = (s: any): Moto['status'] => {
     const v = String(s ?? 'ativa').toLowerCase();
     if (v === 'manutencao' || v === 'inativa') return v as Moto['status'];
@@ -234,12 +234,12 @@ export const MotoProvider = ({ children }: { children: ReactNode }) => {
       if (response.success && response.data) {
         setAlertas(response.data);
       } else {
-        // usar warn pra não abrir RedBox
+        
         console.warn('Erro ao carregar alertas:', response.error || 'sem detalhes');
-        setAlertas([]); // fallback
+        setAlertas([]); 
       }
     } catch (e) {
-      // se backend retornar 404, não quebrar a UI
+      
       console.warn('Falha ao carregar alertas (provável 404 ou rede):', e);
       setAlertas([]);
     } finally {
@@ -254,7 +254,7 @@ export const MotoProvider = ({ children }: { children: ReactNode }) => {
         setAlertas((prev) => prev.map((a) => (a.id === id ? response.data! : a)));
         return true;
       } else if (response.success) {
-        // alguns mocks podem apenas retornar 200 sem body; nesse caso, removemos
+        
         setAlertas((prev) => prev.filter((a) => a.id !== id));
         return true;
       } else {

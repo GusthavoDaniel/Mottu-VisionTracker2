@@ -16,10 +16,10 @@ export default function AuthNavigator() {
     const inAuthGroup = segments[0] === 'auth';
 
     if (!isAuthenticated && !inAuthGroup) {
-      // Usuário não autenticado tentando acessar área protegida
+      
       router.replace('/auth/login');
     } else if (isAuthenticated && inAuthGroup) {
-      // Usuário autenticado na área de auth
+      
       router.replace('/(tabs)');
     }
   }, [isAuthenticated, isLoading, segments]);

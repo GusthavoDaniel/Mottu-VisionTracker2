@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   rmSectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
   spacer: { height: 20 },
 
-  // Botão de ação (logout / login)
+  
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',

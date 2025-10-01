@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-// Tipo usado pelo Toast (mantém compatibilidade com o componente)
+
 export type ToastType = 'success' | 'error' | 'warning' | 'info' | 'default';
 
 export interface ToastState {

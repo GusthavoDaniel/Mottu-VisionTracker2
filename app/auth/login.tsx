@@ -1,236 +1,104 @@
-import React, { useState, useEffect } from 'react';
+// app/auth/login.tsx
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
   ScrollView,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useAuth } from '../contexts/AuthContext';
+import { router } from 'expo-router';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginScreen() {
+  const { colors } = useTheme();
+  const { login, isLoading, error, clearError } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
-  
-  const { login, isLoading, error, clearError } = useAuth();
-  const { colors } = useTheme();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (error) {
-      Alert.alert('Erro', error, [{ text: 'OK', onPress: clearError }]);
-    }
-  }, [error, clearError]);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  const handleEmailChange = (v: string) => {
+    clearError();
+    setEmailError(null);
+    setEmail(v);
   };
 
-  const handleEmailChange = (text: string) => {
-    setEmail(text);
-    if (emailError) setEmailError('');
-    if (error) clearError();
+  const handlePasswordChange = (v: string) => {
+    clearError();
+    setPasswordError(null);
+    setPassword(v);
   };
 
-  const handlePasswordChange = (text: string) => {
-    setPassword(text);
-    if (passwordError) setPasswordError('');
-    if (error) clearError();
-  };
-
-  const handleEmailBlur = () => {
-    setEmailFocused(false);
-    if (email.trim() && !validateEmail(email.trim())) {
-      setEmailError('Formato de email inválido');
-    }
-  };
-
-  const handlePasswordBlur = () => {
-    setPasswordFocused(false);
-    if (password.trim() && password.length < 6) {
-      setPasswordError('A senha deve ter pelo menos 6 caracteres');
-    }
-  };
-
-  const handleLogin = async () => {
-    if (isLoading) return;
-
-    // Limpar erros anteriores
-    setEmailError('');
-    setPasswordError('');
-    
-    let hasError = false;
-
+  const doLogin = async () => {
+    clearError();
+    // validações simples
     if (!email.trim()) {
-      setEmailError('Email é obrigatório');
-      hasError = true;
-    } else if (!validateEmail(email.trim())) {
-      setEmailError('Formato de email inválido');
-      hasError = true;
+      setEmailError('Informe seu email');
+      return;
     }
-
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setEmailError('Email inválido');
+      return;
+    }
     if (!password.trim()) {
-      setPasswordError('Senha é obrigatória');
-      hasError = true;
-    } else if (password.length < 6) {
-      setPasswordError('A senha deve ter pelo menos 6 caracteres');
-      hasError = true;
+      setPasswordError('Informe sua senha');
+      return;
     }
 
-    if (hasError) return;
-    
-    try {
-      const result = await login(email.trim().toLowerCase(), password);
-      
-      if (result.success) {
-        router.replace('/(tabs)');
-      } else if (result.error) {
-        Alert.alert('Erro', result.error);
-      }
-    } catch (error) {
-      Alert.alert('Erro', 'Ocorreu um erro durante o login. Tente novamente.');
+    const res = await login(email.trim(), password);
+    if (res.success) {
+      router.replace('/(tabs)');
+    } else if (res.error) {
+      // erro já fica exposto, mas reforçamos visualmente
+      setPasswordError(res.error);
     }
   };
-
-  const navigateToRegister = () => {
-    router.push('/auth/register');
-  };
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    scrollContainer: {
-      flexGrow: 1,
-      justifyContent: 'center',
-      padding: 20,
-    },
-    logoContainer: {
-      alignItems: 'center',
-      marginBottom: 40,
-    },
-    logo: {
-      fontSize: 32,
-      fontWeight: 'bold',
-      color: colors.primary,
-      marginBottom: 8,
-    },
-    subtitle: {
-      fontSize: 16,
-      color: colors.textSecondary,
-      textAlign: 'center',
-    },
-    formContainer: {
-      marginBottom: 30,
-    },
-    inputContainer: {
-      marginBottom: 16,
-    },
-    label: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.text,
-      marginBottom: 8,
-    },
-    input: {
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 8,
-      padding: 12,
-      fontSize: 16,
-      color: colors.text,
-      backgroundColor: colors.card,
-    },
-    inputFocused: {
-      borderColor: colors.primary,
-      borderWidth: 2,
-    },
-    loginButton: {
-      backgroundColor: colors.primary,
-      borderRadius: 8,
-      padding: 16,
-      alignItems: 'center',
-      marginTop: 8,
-    },
-    loginButtonDisabled: {
-      backgroundColor: colors.textSecondary,
-    },
-    loginButtonText: {
-      color: '#FFFFFF',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    registerContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 20,
-    },
-    registerText: {
-      color: colors.textSecondary,
-      fontSize: 14,
-    },
-    registerLink: {
-      color: colors.primary,
-      fontSize: 14,
-      fontWeight: '600',
-      marginLeft: 4,
-    },
-    loadingContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    loadingText: {
-      color: '#FFFFFF',
-      fontSize: 16,
-      fontWeight: '600',
-      marginLeft: 8,
-    },
-  });
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <KeyboardAvoidingView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Logo / título */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logo}>Mottu VisionTracker</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.logoText, { color: colors.text }]}>Mottu VisionTracker</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Sistema de Gestão Inteligente de Pátio
           </Text>
         </View>
 
+        {/* Form */}
         <View style={styles.formContainer}>
+          {/* Email */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Email</Text>
             <TextInput
               style={[
                 styles.input,
                 emailFocused && styles.inputFocused,
-                emailError && styles.inputError
+                !!emailError && styles.inputError,
+                { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface },
               ]}
               value={email}
               onChangeText={handleEmailChange}
               onFocus={() => setEmailFocused(true)}
-              onBlur={handleEmailBlur}
+              onBlur={() => setEmailFocused(false)}
               placeholder="Digite seu email"
               placeholderTextColor={colors.textSecondary}
               keyboardType="email-address"
@@ -238,56 +106,62 @@ export default function LoginScreen() {
               autoCorrect={false}
               editable={!isLoading}
             />
-            {emailError ? (
-              <Text style={styles.errorText}>{emailError}</Text>
-            ) : null}
+            {!!emailError && <Text style={[styles.errorText, { color: colors.error }]}>{emailError}</Text>}
           </View>
 
+          {/* Senha */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Senha</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Senha</Text>
             <TextInput
               style={[
                 styles.input,
                 passwordFocused && styles.inputFocused,
-                passwordError && styles.inputError
+                !!passwordError && styles.inputError,
+                { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface },
               ]}
               value={password}
               onChangeText={handlePasswordChange}
               onFocus={() => setPasswordFocused(true)}
-              onBlur={handlePasswordBlur}
+              onBlur={() => setPasswordFocused(false)}
               placeholder="Digite sua senha"
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
               editable={!isLoading}
             />
-            {passwordError ? (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            ) : null}
+            {!!passwordError && (
+              <Text style={[styles.errorText, { color: colors.error }]}>{passwordError}</Text>
+            )}
           </View>
 
+          {/* Erro global (vindo do contexto) */}
+          {!!error && <Text style={[styles.errorText, { color: colors.error, textAlign: 'center' }]}>{error}</Text>}
+
+          {/* Ação */}
           <TouchableOpacity
             style={[
-              styles.loginButton,
-              isLoading && styles.loginButtonDisabled
+              styles.button,
+              { backgroundColor: colors.accent, opacity: isLoading ? 0.8 : 1 },
             ]}
-            onPress={handleLogin}
+            onPress={doLogin}
             disabled={isLoading}
           >
             {isLoading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator color="#FFFFFF" size="small" />
-                <Text style={styles.loadingText}>Entrando...</Text>
-              </View>
+              <>
+                <ActivityIndicator color="#000" />
+                <Text style={[styles.buttonText, styles.loadingText]}>  Entrando…</Text>
+              </>
             ) : (
-              <Text style={styles.loginButtonText}>Entrar</Text>
+              <Text style={[styles.buttonText, { color: '#000' }]}>Entrar</Text>
             )}
           </TouchableOpacity>
-        </View>
 
-        <View style={styles.registerContainer}>
-          <Text style={styles.registerText}>Não tem uma conta?</Text>
-          <TouchableOpacity onPress={navigateToRegister} disabled={isLoading}>
-            <Text style={styles.registerLink}>Cadastre-se</Text>
+          {/* Link para cadastro */}
+          <TouchableOpacity style={styles.link} onPress={() => router.push('/auth/register')}>
+            <Text style={[styles.linkText, { color: colors.accent }]}>
+              Não tem conta? Cadastre-se
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -295,3 +169,45 @@ export default function LoginScreen() {
   );
 }
 
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  scrollContainer: { flex: 1 },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 48,
+    marginBottom: 24,
+  },
+  logoText: { fontSize: 22, fontWeight: '800' },
+  subtitle: { marginTop: 4, fontSize: 14 },
+  formContainer: { paddingHorizontal: 20, paddingTop: 8 },
+
+  inputContainer: { marginBottom: 16 },
+  label: { fontSize: 14, fontWeight: '600', marginBottom: 8 },
+
+  input: {
+    height: 48,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    fontSize: 16,
+  },
+  // <<< estas chaves faltavam, por isso o TS reclamava
+  inputFocused: { borderWidth: 1.5 },
+  inputError: { borderColor: '#ff4d4f' },
+
+  errorText: { fontSize: 13, marginTop: 6 },
+
+  button: {
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+    flexDirection: 'row',
+  },
+  buttonText: { fontSize: 16, fontWeight: '700' },
+  loadingText: { color: '#000' },
+
+  link: { alignItems: 'center', marginTop: 16 },
+  linkText: { fontSize: 14, fontWeight: '600' },
+});
