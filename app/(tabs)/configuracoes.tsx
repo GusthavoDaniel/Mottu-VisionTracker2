@@ -14,26 +14,18 @@ import {
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 export default function ConfiguracoesScreen() {
   const { isDark, toggleTheme, colors } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
 
-  const openLink = (url: string) => {
-    Linking.openURL(url);
-  };
+  const openLink = (url: string) => Linking.openURL(url);
 
   const handleLogout = () => {
     Alert.alert('Sair', 'Tem certeza que deseja sair da sua conta?', [
-      {
-        text: 'Cancelar',
-        style: 'cancel',
-      },
-      {
-        text: 'Sair',
-        style: 'destructive',
-        onPress: logout,
-      },
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Sair', style: 'destructive', onPress: logout },
     ]);
   };
 
@@ -53,7 +45,7 @@ export default function ConfiguracoesScreen() {
         <Text style={[styles.appVersion, { color: colors.text }]}>Versão 1.0.0</Text>
       </View>
 
-      {/* Seção do Usuário */}
+      {/* Seção do Usuário (se logado) */}
       {user && (
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={styles.cardHeader}>
@@ -74,14 +66,6 @@ export default function ConfiguracoesScreen() {
               <Text style={[styles.infoValue, { color: colors.text }]}>{user.email}</Text>
             </View>
           </View>
-
-          <TouchableOpacity
-            style={[styles.logoutButton, { backgroundColor: colors.error }]}
-            onPress={handleLogout}
-          >
-            <Ionicons name="log-out-outline" size={20} color="#FFFFFF" />
-            <Text style={styles.logoutText}>Sair da Conta</Text>
-          </TouchableOpacity>
         </View>
       )}
 
@@ -196,6 +180,33 @@ export default function ConfiguracoesScreen() {
         </View>
       </View>
 
+      {/* Conta / Ações */}
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <View style={styles.cardHeader}>
+          <Ionicons name="settings" size={22} color={colors.accent} />
+          <Text style={[styles.cardTitle, { color: colors.text }]}>Conta</Text>
+        </View>
+
+        {user ? (
+          <TouchableOpacity
+            style={[styles.logoutButton, { backgroundColor: colors.error }]}
+            onPress={handleLogout}
+            disabled={isLoading}
+          >
+            <Ionicons name="log-out-outline" size={20} color="#FFFFFF" />
+            <Text style={styles.logoutText}>{isLoading ? 'Saindo...' : 'Sair da Conta'}</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.logoutButton, { backgroundColor: colors.accent }]}
+            onPress={() => router.replace('/auth/login')}
+          >
+            <Ionicons name="log-in-outline" size={20} color="#000" />
+            <Text style={[styles.logoutText, { color: '#000' }]}>Ir para Login</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       {/* Rodapé */}
       <View style={styles.footer}>
         <Text style={[styles.footerText, { color: colors.text + '80' }]}>
@@ -217,146 +228,53 @@ export default function ConfiguracoesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  header: {
-    alignItems: 'center',
-    marginVertical: 24,
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 12,
-  },
-  appName: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  appVersion: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
+  container: { flex: 1, padding: 16 },
+  header: { alignItems: 'center', marginVertical: 24 },
+  logo: { width: 80, height: 80, marginBottom: 12 },
+  appName: { fontSize: 28, fontWeight: 'bold', marginBottom: 4 },
+  appVersion: { fontSize: 14, opacity: 0.7 },
   card: {
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-      web: {
-        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-      },
+      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
+      android: { elevation: 3 },
+      web: { boxShadow: '0px 2px 4px rgba(0,0,0,0.1)' },
     }),
   },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 10,
-  },
-  userInfo: {
-    marginBottom: 16,
-  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  cardTitle: { fontSize: 18, fontWeight: '600', marginLeft: 10 },
+  userInfo: { marginBottom: 16 },
+  settingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  settingLabel: { fontSize: 16, fontWeight: '500' },
+  settingDescription: { fontSize: 14, marginTop: 2 },
+  infoRow: { paddingVertical: 12 },
+  infoLabel: { fontSize: 14, marginBottom: 4 },
+  infoValue: { fontSize: 16, fontWeight: '500' },
+  divider: { height: 1, opacity: 0.1, backgroundColor: '#888' },
+  aboutText: { fontSize: 15, lineHeight: 22, marginBottom: 16 },
+  featureContainer: { marginTop: 8 },
+  featureItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  featureText: { fontSize: 15, marginLeft: 10 },
+  rmContainer: { marginTop: 8 },
+  rmSectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
+  spacer: { height: 20 },
+
+  // Botão de ação (logout / login)
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginTop: 8,
+    gap: 8,
   },
-  logoutText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  settingLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  settingDescription: {
-    fontSize: 14,
-    marginTop: 2,
-  },
-  infoRow: {
-    paddingVertical: 12,
-  },
-  infoLabel: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  infoValue: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  divider: {
-    height: 1,
-    opacity: 0.1,
-    backgroundColor: '#888',
-  },
-  aboutText: {
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 16,
-  },
-  featureContainer: {
-    marginTop: 8,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  featureText: {
-    fontSize: 15,
-    marginLeft: 10,
-  },
-  footer: {
-    marginTop: 8,
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 13,
-    marginBottom: 12,
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  socialButton: {
-    marginHorizontal: 10,
-    padding: 8,
-  },
-  rmContainer: {
-    marginTop: 8,
-  },
-  rmSectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  spacer: {
-    height: 20,
-  },
+  logoutText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+
+  footer: { marginTop: 8, marginBottom: 24, alignItems: 'center' },
+  footerText: { fontSize: 13, marginBottom: 12 },
+  socialContainer: { flexDirection: 'row', justifyContent: 'center' },
+  socialButton: { marginHorizontal: 10, padding: 8 },
 });
