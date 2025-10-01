@@ -1,5 +1,14 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+// contexts/AuthContext.tsx
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 import ApiService from '../services/api';
 
 interface User {
@@ -13,11 +22,16 @@ interface AuthContextProps {
   user: User | null;
   isLoading: boolean;
   error: string | null;
+  isAuthenticated: boolean;
+  clearError: () => void;
+
+  // ações
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  isAuthenticated: boolean;
-  clearError: () => void;
+
+  // utilitário opcional (quando você quiser setar sessão manualmente)
+  setSession: (u: User | null) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({} as AuthContextProps);
@@ -26,113 +40,98 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    checkAuthState();
-  }, []);
+  
 
   const clearError = () => setError(null);
 
-  const checkAuthState = async () => {
-    try {
-      const userData = await AsyncStorage.getItem('@user');
-      const token = await AsyncStorage.getItem('@token');
-      
-      if (userData && token) {
-        const parsedUser = JSON.parse(userData);
-        setUser({ ...parsedUser, token });
-      }
-    } catch (error) {
-      console.error('Erro ao verificar estado de autenticação:', error);
-      // Limpar dados corrompidos
+  const setSession = useCallback(async (u: User | null) => {
+    if (u) {
+      setUser(u);
+      const pairs: [string, string][] = [['@user', JSON.stringify(u)]];
+      if (u.token) pairs.push(['@token', u.token]);
+      await AsyncStorage.multiSet(pairs);
+    } else {
+      setUser(null);
       await AsyncStorage.multiRemove(['@user', '@token']);
+    }
+  }, []);
+
+  const checkAuthState = useCallback(async () => {
+    try {
+      const [userData, token] = await AsyncStorage.multiGet(['@user', '@token']);
+      const rawUser = userData?.[1];
+      const rawToken = token?.[1];
+
+      if (rawUser) {
+        const parsed = JSON.parse(rawUser) as User;
+        const u: User = { ...parsed, token: rawToken || parsed.token };
+        setUser(u);
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error('Erro ao verificar estado de autenticação:', err);
+      await AsyncStorage.multiRemove(['@user', '@token']);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  useEffect(() => {
+    checkAuthState();
+  }, [checkAuthState]);
+
+  const validateEmail = (email: string): boolean =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const validatePassword = (password: string): { isValid: boolean; message?: string } => {
-    if (password.length < 6) {
-      return { isValid: false, message: 'A senha deve ter pelo menos 6 caracteres' };
-    }
-    if (!/(?=.*[a-z])/.test(password)) {
-      return { isValid: false, message: 'A senha deve conter pelo menos uma letra minúscula' };
-    }
-    if (!/(?=.*\d)/.test(password)) {
-      return { isValid: false, message: 'A senha deve conter pelo menos um número' };
-    }
+    if (password.length < 6) return { isValid: false, message: 'A senha deve ter pelo menos 6 caracteres' };
+    if (!/(?=.*[a-z])/.test(password)) return { isValid: false, message: 'A senha deve conter pelo menos uma letra minúscula' };
+    if (!/(?=.*\d)/.test(password)) return { isValid: false, message: 'A senha deve conter pelo menos um número' };
     return { isValid: true };
   };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      // Validações client-side
-      if (!email.trim()) {
-        return { success: false, error: 'Email é obrigatório' };
-      }
-      
-      if (!validateEmail(email.trim())) {
-        return { success: false, error: 'Formato de email inválido' };
-      }
-      
-      if (!password.trim()) {
-        return { success: false, error: 'Senha é obrigatória' };
+      const e = email.trim().toLowerCase();
+      const p = password.trim();
+
+      if (!e) return { success: false, error: 'Email é obrigatório' };
+      if (!validateEmail(e)) return { success: false, error: 'Formato de email inválido' };
+      if (!p) return { success: false, error: 'Senha é obrigatória' };
+
+      // 1) tenta API
+      const api = await ApiService.login(e, p);
+      if (api.success && api.data) {
+        const u: User = {
+          id: api.data.id || Date.now().toString(),
+          name: api.data.name || api.data.nome || 'Usuário',
+          email: e,
+          token: api.data.token,
+        };
+        await setSession(u);
+        return { success: true };
       }
 
-      // Tentar login via API primeiro
-      const apiResponse = await ApiService.login(email.trim().toLowerCase(), password);
-      
-      if (apiResponse.success && apiResponse.data) {
-        const userData: User = {
-          id: apiResponse.data.id || Date.now().toString(),
-          name: apiResponse.data.name || apiResponse.data.nome || 'Usuário',
-          email: email.trim().toLowerCase(),
-          token: apiResponse.data.token
-        };
-        
-        setUser(userData);
-        await AsyncStorage.setItem('@user', JSON.stringify(userData));
-        if (userData.token) {
-          await AsyncStorage.setItem('@token', userData.token);
-        }
-        
-        return { success: true };
-      }
-      
-      // Fallback para AsyncStorage (desenvolvimento)
+      // 2) fallback local (dev)
       const usersData = await AsyncStorage.getItem('@users');
       const users = usersData ? JSON.parse(usersData) : [];
-      
-      const foundUser = users.find((u: any) => 
-        u.email === email.trim().toLowerCase() && u.password === password
-      );
-      
-      if (foundUser) {
-        const userData: User = {
-          id: foundUser.id,
-          name: foundUser.name,
-          email: foundUser.email
-        };
-        
-        setUser(userData);
-        await AsyncStorage.setItem('@user', JSON.stringify(userData));
+      const found = users.find((u: any) => u.email === e && u.password === p);
+      if (found) {
+        const u: User = { id: found.id, name: found.name, email: found.email };
+        await setSession(u);
         return { success: true };
       }
-      
-      return { success: false, error: 'Email ou senha incorretos' };
-      
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro de conexão';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
+
+      return { success: false, error: api.error || 'Email ou senha incorretos' };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erro de conexão';
+      setError(msg);
+      return { success: false, error: msg };
     } finally {
       setIsLoading(false);
     }
@@ -141,84 +140,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     setError(null);
-    
-    try {
-      // Validações client-side
-      if (!name.trim()) {
-        return { success: false, error: 'Nome é obrigatório' };
-      }
-      
-      if (name.trim().length < 2) {
-        return { success: false, error: 'Nome deve ter pelo menos 2 caracteres' };
-      }
-      
-      if (!email.trim()) {
-        return { success: false, error: 'Email é obrigatório' };
-      }
-      
-      if (!validateEmail(email.trim())) {
-        return { success: false, error: 'Formato de email inválido' };
-      }
-      
-      const passwordValidation = validatePassword(password);
-      if (!passwordValidation.isValid) {
-        return { success: false, error: passwordValidation.message };
-      }
 
-      // Tentar registro via API primeiro
-      const apiResponse = await ApiService.register(name.trim(), email.trim().toLowerCase(), password);
-      
-      if (apiResponse.success && apiResponse.data) {
-        const userData: User = {
-          id: apiResponse.data.id || Date.now().toString(),
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-          token: apiResponse.data.token
+    try {
+      const n = name.trim();
+      const e = email.trim().toLowerCase();
+      const p = password;
+
+      if (!n) return { success: false, error: 'Nome é obrigatório' };
+      if (n.length < 2) return { success: false, error: 'Nome deve ter pelo menos 2 caracteres' };
+      if (!e) return { success: false, error: 'Email é obrigatório' };
+      if (!validateEmail(e)) return { success: false, error: 'Formato de email inválido' };
+
+      const pass = validatePassword(p);
+      if (!pass.isValid) return { success: false, error: pass.message };
+
+      // 1) tenta API
+      const api = await ApiService.register(n, e, p);
+      if (api.success && api.data) {
+        const u: User = {
+          id: api.data.id || Date.now().toString(),
+          name: api.data.name || n,
+          email: e,
+          token: api.data.token,
         };
-        
-        setUser(userData);
-        await AsyncStorage.setItem('@user', JSON.stringify(userData));
-        if (userData.token) {
-          await AsyncStorage.setItem('@token', userData.token);
-        }
-        
+        await setSession(u);
         return { success: true };
       }
-      
-      // Fallback para AsyncStorage (desenvolvimento)
+
+      // 2) fallback local (dev)
       const usersData = await AsyncStorage.getItem('@users');
       const users = usersData ? JSON.parse(usersData) : [];
-      
-      const existingUser = users.find((u: any) => u.email === email.trim().toLowerCase());
-      if (existingUser) {
+      if (users.find((u: any) => u.email === e)) {
         return { success: false, error: 'Este email já está cadastrado' };
       }
-      
-      const newUser = {
-        id: Date.now().toString(),
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        password
-      };
-      
+
+      const newUser = { id: Date.now().toString(), name: n, email: e, password: p };
       users.push(newUser);
       await AsyncStorage.setItem('@users', JSON.stringify(users));
-      
-      const userData: User = {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email
-      };
-      
-      setUser(userData);
-      await AsyncStorage.setItem('@user', JSON.stringify(userData));
-      
+
+      const u: User = { id: newUser.id, name: n, email: e };
+      await setSession(u);
       return { success: true };
-      
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro de conexão';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erro de conexão';
+      setError(msg);
+      return { success: false, error: msg };
     } finally {
       setIsLoading(false);
     }
@@ -226,42 +192,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async (): Promise<void> => {
     setIsLoading(true);
-    
+
     try {
-      // Tentar logout via API
-      await ApiService.logout();
-    } catch (error) {
-      console.warn('Erro no logout da API:', error);
-    }
-    
-    try {
-      await AsyncStorage.multiRemove(['@user', '@token']);
-      setUser(null);
+      // tenta API (se existir endpoint)
+      try { await ApiService.logout(); } catch (e) { /* ignora erro de rede */ }
+      // limpa sessão local
+      await setSession(null);
       setError(null);
-    } catch (error) {
-      console.error('Erro no logout:', error);
+
     } finally {
+
       setIsLoading(false);
+      // redireciona para login
+      router.replace('/auth/login');
     }
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isLoading, 
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
         error,
-        login, 
-        register, 
-        logout, 
         isAuthenticated: !!user,
-        clearError
+        clearError,
+        login,
+        register,
+        logout,
+        setSession,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => useContext(AuthContext);
 
