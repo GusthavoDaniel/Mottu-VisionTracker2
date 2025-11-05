@@ -282,5 +282,14 @@
     "loggingOut": "Signing out...",
     "logoutButton": "Sign out",
     "goToLogin": "Go to Login"
+  },
+
+  "dashboardScreen": {
+    "criticalAlerts": "Critical Alerts",
+    "operationalKPIs": "Operational KPIs",
+    "alert1": "RFID read failure on motorcycle XYZ1234.",
+    "alert2": "Low battery detected on motorcycle ABC9876.",
+    "avgStay": "Average patio stay: 2.4 days.",
+    "entriesExits24hKpi": "Entries/Exits in last 24h: 12 / 9"
   }
 }

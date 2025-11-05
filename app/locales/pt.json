@@ -264,5 +264,14 @@
     "loggingOut": "Saindo...",
     "logoutButton": "Sair da Conta",
     "goToLogin": "Ir para Login"
+  },
+
+  "dashboardScreen": {
+    "criticalAlerts": "Alertas Críticos",
+    "operationalKPIs": "KPIs Operacionais",
+    "alert1": "Moto XYZ1234 parada há 48h na Zona Norte.",
+    "alert2": "Bateria crítica na moto ABC9876.",
+    "avgStay": "Permanência média no pátio: 2,4 dias.",
+    "entriesExits24hKpi": "Entradas/Saídas nas últimas 24h: 12 / 9"
   }
 }

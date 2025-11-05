@@ -282,5 +282,14 @@
     "loggingOut": "Saliendo...",
     "logoutButton": "Cerrar sesión",
     "goToLogin": "Ir al login"
+  },
+
+  "dashboardScreen": {
+    "criticalAlerts": "Alertas Críticas",
+    "operationalKPIs": "KPIs Operacionales",
+    "alert1": "Falla en la lectura RFID en la moto XYZ1234.",
+    "alert2": "Batería baja detectada en la moto ABC9876.",
+    "avgStay": "Estancia promedio en patio: 2,4 días.",
+    "entriesExits24hKpi": "Entradas/Salidas últimas 24h: 12 / 9"
   }
 }
