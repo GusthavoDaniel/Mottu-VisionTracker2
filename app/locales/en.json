@@ -1,0 +1,286 @@
+{
+  "common": {
+    "appName": "Mottu VisionTracker",
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPassword": "Confirm Password",
+    "name": "Full Name",
+    "enter": "Enter",
+    "createAccount": "Create Account",
+    "back": "Back",
+    "error": "Error",
+    "success": "Success",
+    "loading": "Loading...",
+    "noAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginHere": "Login here",
+    "registerHere": "Register here",
+    "requiredField": "This field is required",
+    "invalidEmail": "Invalid email format",
+    "passwordMinLength": "Password must be at least 6 characters long",
+    "passwordsMismatch": "Passwords do not match",
+    "nameMinLength": "Name must be at least 2 characters long",
+    "connectionError": "Connection error",
+    "cancel": "Cancel",
+    "close": "Close",
+
+    "dashboard": "Dashboard",
+    "patioMap": "Patio Map",
+    "registerRFID": "Register RFID",
+    "reports": "Reports",
+    "totalInPatio": "Total in Patio:",
+    "inMaintenance": "In Maintenance:",
+    "activeAlerts": "Active Alerts:",
+    "inMovement": "In Movement:",
+    "criticalAlerts": "Critical Alerts",
+    "operationalKPIs": "Operational KPIs",
+    "avgStay": "Avg. Stay:",
+    "entriesExits24h": "Entries/Exits last 24h:",
+    "viewPatio": "View Patio",
+    "registerMoto": "Register Motorcycle",
+
+    "search": "Search",
+    "searchPlaceholder": "Search by plate, model, status...",
+    "results": "{{count}} result(s)",
+    "noMotorcyclesFound": "No motorcycles found",
+
+    "edit": "Edit",
+    "delete": "Delete",
+    "addMoto": "Add New Motorcycle",
+
+    "plate": "Plate",
+    "model": "Model",
+    "color": "Color",
+    "owner": "Owner",
+    "status": "Status",
+    "active": "ACTIVE",
+    "maintenance": "MAINTENANCE",
+    "inactive": "INACTIVE",
+    "invalidPlateFormat": "Invalid plate format. Use AAA0000 or AAA0A00",
+    "motoDetails": "Motorcycle Details",
+
+    "alertHistory": "Alert History",
+    "noAlertsFound": "No alerts found.",
+    "pullToRefresh": "Pull down to refresh.",
+    "alertType": "Type",
+
+    "action": "Action",
+    "payload": "Payload",
+    "title": "Title",
+    "body": "Body",
+    "ok": "OK",
+
+    "motoRegistered": "Motorcycle {{model}} ({{plate}}) registered successfully!",
+    "motoUpdated": "Motorcycle {{model}} ({{plate}}) updated successfully!",
+    "motoDeleted": "Motorcycle {{model}} ({{plate}}) deleted successfully!"
+  },
+
+  "notifications": {
+    "screenTitle": "Push Notification Test",
+    "yourExpoPushToken": "Your Expo Push Token:",
+    "noTokenFound": "No token found.",
+    "getToken": "Get/Update Token",
+    "notificationTitle": "Notification Title:",
+    "notificationBody": "Notification Body:",
+    "sendLocalNotification": "Send Local Notification",
+    "clearBadge": "Clear Badge Counter",
+    "permissionGranted": "Permission Granted",
+    "permissionDenied": "Permission Denied",
+    "notificationSent": "Notification sent successfully!",
+    "notificationFailed": "Failed to send notification. Check permissions.",
+    "badgeCleared": "Badge counter cleared.",
+    "notificationReceivedForeground": "Notification Received (Foreground)",
+    "notificationInteracted": "Notification Interacted"
+  },
+
+  "cadastrarMoto": {
+    "title": "Register New Motorcycle",
+    "placaLabel": "Plate",
+    "proprietarioLabel": "Owner",
+    "proprietarioPlaceholder": "Enter owner's name",
+    "statusLabel": "Status",
+    "buttonText": "Register Motorcycle",
+    "validation": {
+      "placaRequired": "Please enter the motorcycle plate",
+      "proprietarioRequired": "Please enter the owner's name",
+      "proprietarioMinLength": "Owner's name must be at least 2 characters long",
+      "placaInvalid": "Invalid plate format. Use AAA0000 or AAA0A00"
+    },
+    "successMessage": "Motorcycle {{modelo}} with plate {{placa}} registered successfully!"
+  },
+
+  "mapaPatio": {
+    "title": "Patio Map",
+    "mapaTab": "Map",
+    "listaTab": "List",
+    "cadastrarMotoButton": "+ Register Motorcycle",
+    "searchPlaceholder": "Search by plate, model, status…",
+    "noMotosFound": "No motorcycles found",
+    "alert": {
+      "motoMovedTitle": "Motorcycle Moved",
+      "motoMovedMessage": "New position: {{newX}}, {{newY}}\\nZone: {{zona}}",
+      "motoDetailsTitle": "Motorcycle Details",
+      "motoDetailsMessage": "Plate: {{placa}}"
+    }
+  },
+
+  "footer": {
+    "copyright": "© 2025 Mottu Patio App - All rights reserved.",
+    "version": "Version 1.0.0"
+  },
+
+  "notificationService": {
+    "moto_created_title": "🏍️ Motorcycle Registered!",
+    "moto_created_body": "The motorcycle {{1}} ({{2}}) was registered successfully.",
+    "moto_updated_title": "✏️ Motorcycle Updated!",
+    "moto_updated_body": "The motorcycle {{1}} ({{2}}) was updated successfully.",
+    "moto_deleted_title": "🗑️ Motorcycle Removed!",
+    "moto_deleted_body": "The motorcycle {{1}} ({{2}}) was removed from the system.",
+    "rfid_alert_title_sem_leitura": "Alert: No Reading",
+    "rfid_alert_title_bateria_baixa": "Alert: Low Battery",
+    "rfid_alert_title_manutencao": "Alert: Maintenance",
+    "rfid_alert_title_fora_area": "Alert: Out of Area",
+    "rfid_alert_title_default": "RFID Alert",
+    "login_success_title": "👋 Welcome!",
+    "login_success_body": "Hello {{1}}, you have successfully logged in.",
+    "data_sync_title": "🔄 Data Synchronized",
+    "data_sync_body": "Your data has been successfully synchronized.",
+    "offline_mode_title": "📱 Offline Mode",
+    "offline_mode_body": "You are working offline. Data will be synchronized when connection is re-established.",
+    "notification_button_view_details": "View Details",
+    "notification_button_view_alert": "View Alert",
+    "notification_button_dismiss": "Dismiss"
+  },
+
+  "loginScreen": {
+    "subtitle": "Smart Patio Management System"
+  },
+
+  "languageSelector": {
+    "title": "Select Language",
+    "languageChangedSuccessfully": "Language changed to {{lang}} successfully!",
+    "languageChangeError": "Error changing language."
+  },
+
+  "aboutScreen": {
+    "title": "About App",
+    "appName": "Mottu VisionTracker",
+    "subtitle": "Smart Patio Management System",
+    "versionInfo": "Version Information",
+    "version": "Version",
+    "buildHash": "Commit Hash",
+    "buildDate": "Build Date",
+    "developers": "Developers",
+    "legal": "Legal Information",
+    "license": "License",
+    "copyright": "Copyright"
+  },
+
+  "registerScreen": {
+    "title": "Create Account",
+    "subtitle": "Register to access the system",
+    "accountCreated": "Account created successfully!",
+    "emailInUse": "This email is already in use. Try another email.",
+    "registrationError": "An error occurred during registration. Please try again.",
+    "namePlaceholder": "Enter your full name",
+    "confirmPasswordPlaceholder": "Confirm your password"
+  },
+
+  "branches": {
+    "screenTitle": "Branch Management",
+    "title": "Branch Network",
+    "subtitle": "Manage all Mottu branches",
+    "filters": "Filters",
+    "country": "Country",
+    "state": "State",
+    "filterByCountryPlaceholder": "Filter by country",
+    "filterByStatePlaceholder": "Filter by state",
+    "showingCountOfTotal": "Showing {{count}} of {{total}} branches",
+
+    "total": "Total",
+    "available": "Available",
+    "maintenance": "Maintenance",
+    "rented": "Rented",
+    "viewOnMap": "View on map",
+
+    "detailsTitle": "Branch Details",
+    "viewFullMap": "View full map",
+    "fleetStatsTitle": "Fleet Statistics",
+    "totalVehicles": "Total vehicles",
+    "availabilityRate": "Availability rate",
+    "viewYard": "View yard",
+    "viewIoT": "IoT monitoring",
+
+    "aboutTitle": "About Branch Management",
+    "aboutBody": "The branch management system allows you to view and manage all Mottu units in different locations. Through this interface, you can monitor the fleet status at each branch, access detailed information and navigate to specific features of each unit.",
+    "aboutBullet1": "Centralized view of all branches",
+    "aboutBullet2": "Real-time fleet statistics",
+    "aboutBullet3": "Quick access to each branch yard map",
+    "aboutBullet4": "Integration with IoT monitoring system"
+  },
+
+  "supervisor": {
+    "title": "Supervisor Panel",
+    "subtitle": "Motorcycle monitoring by sector",
+    "total": "Total",
+    "sectorsOverview": "Sectors Overview",
+    "yardMap": "Yard Map",
+    "viewMap": "View Map",
+
+    "sectorA": "Sector A",
+    "sectorB": "Sector B",
+    "sectorC": "Sector C",
+    "sectorD": "Sector D",
+
+    "oneMoto": "bike",
+    "manyMotos": "bikes",
+
+    "motosInSector": "Bikes in {{sector}}",
+    "allMotos": "All Bikes",
+    "noMotosInSector": "No bikes found in this sector",
+    "noMotos": "No bikes registered in the system",
+    "lastUpdate": "Last update: {{time}}",
+
+    "motoAlert": {
+      "title": "Bike {{plate}}",
+      "body": "Model: {{model}}\nColor: {{color}}\nLocation: {{sector}}\n\nHistory:\n{{history}}"
+    }
+  },
+
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "darkTheme": "Dark Theme",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+
+    "about": "About the App",
+    "description": "This is a prototype for Mottu's yard mapping, allowing you to view and manage motorcycle locations interactively.",
+
+    "interactiveMap": "Interactive Map",
+    "motoTracking": "Motorcycle Tracking",
+    "organizedSectors": "Organized Sectors",
+
+    "language": "Language",
+    "changeLanguage": "Change language",
+    "themeAuto": "Automatic",
+
+    "userSectionTitle": "User",
+    "logoutTitle": "Sign out",
+    "logoutMessage": "Are you sure you want to sign out of your account?",
+    "logoutConfirm": "Sign out",
+
+    "membersTitle": "Team Members",
+    "rmsTitle": "RMs",
+    "namesTitle": "Names",
+
+    "accountTitle": "Account",
+    "loggingOut": "Signing out...",
+    "logoutButton": "Sign out",
+    "goToLogin": "Go to Login"
+  }
+}

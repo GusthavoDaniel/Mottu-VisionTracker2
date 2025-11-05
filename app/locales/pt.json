@@ -1,0 +1,268 @@
+{
+  "common": {
+    "appName": "Mottu VisionTracker",
+    "login": "Login",
+    "register": "Registrar",
+    "email": "Email",
+    "emailPlaceholder": "Digite seu email",
+    "password": "Senha",
+    "passwordPlaceholder": "Digite sua senha",
+    "confirmPassword": "Confirmar Senha",
+    "name": "Nome Completo",
+    "enter": "Entrar",
+    "createAccount": "Criar Conta",
+    "back": "Voltar",
+    "error": "Erro",
+    "success": "Sucesso",
+    "loading": "Carregando...",
+    "noAccount": "Não tem conta?",
+    "alreadyHaveAccount": "Já tem uma conta?",
+    "loginHere": "Faça login aqui",
+    "registerHere": "Cadastre-se aqui",
+    "requiredField": "Este campo é obrigatório",
+    "invalidEmail": "Formato de email inválido",
+    "passwordMinLength": "A senha deve ter pelo menos 6 caracteres",
+    "passwordsMismatch": "As senhas não coincidem",
+    "nameMinLength": "O nome deve ter pelo menos 2 caracteres",
+    "connectionError": "Erro de conexão",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+
+    "dashboard": "Dashboard",
+    "patioMap": "Mapa do Pátio",
+    "registerRFID": "Registrar RFID",
+    "reports": "Relatórios",
+    "totalInPatio": "Total no Pátio:",
+    "inMaintenance": "Em Manutenção:",
+    "activeAlerts": "Alertas Ativos:",
+    "inMovement": "Em Movimento:",
+    "criticalAlerts": "Alertas Críticos",
+    "operationalKPIs": "KPIs Operacionais",
+    "avgStay": "Permanência média:",
+    "entriesExits24h": "Entradas/Saídas últimas 24h:",
+    "viewPatio": "Ver Pátio",
+    "registerMoto": "Cadastrar Moto",
+
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar por placa, modelo, status…",
+    "results": "{{count}} resultado(s)",
+    "noMotorcyclesFound": "Nenhuma moto encontrada",
+
+    "edit": "Editar",
+    "delete": "Excluir",
+    "addMoto": "Cadastrar Nova Moto",
+
+    "plate": "Placa",
+    "model": "Modelo",
+    "color": "Cor",
+    "owner": "Proprietário",
+    "status": "Status",
+    "active": "ATIVA",
+    "maintenance": "MANUTENÇÃO",
+    "inactive": "INATIVA",
+    "invalidPlateFormat": "Formato de placa inválido. Use AAA0000 ou AAA0A00",
+    "motoDetails": "Detalhes da Moto",
+
+    "alertHistory": "Histórico de Alertas",
+    "noAlertsFound": "Nenhum alerta encontrado.",
+    "pullToRefresh": "Puxe para baixo para atualizar.",
+    "alertType": "Tipo",
+
+    "action": "Ação",
+    "payload": "Carga Útil",
+    "title": "Título",
+    "body": "Corpo",
+    "ok": "OK",
+
+    "motoRegistered": "Moto {{model}} ({{plate}}) cadastrada com sucesso!",
+    "motoUpdated": "Moto {{model}} ({{plate}}) atualizada com sucesso!",
+    "motoDeleted": "Moto {{model}} ({{plate}}) removida do sistema."
+  },
+
+  "cadastrarMoto": {
+    "title": "Cadastrar Nova Moto",
+    "placaLabel": "Placa",
+    "proprietarioLabel": "Proprietário",
+    "proprietarioPlaceholder": "Nome do proprietário",
+    "statusLabel": "Status",
+    "buttonText": "Cadastrar Moto",
+    "validation": {
+      "placaRequired": "Por favor, insira a placa da moto",
+      "proprietarioRequired": "Por favor, insira o nome do proprietário",
+      "proprietarioMinLength": "O nome do proprietário deve ter pelo menos 2 caracteres",
+      "placaInvalid": "Formato de placa inválido. Use AAA0000 ou AAA0A00"
+    },
+    "successMessage": "Moto {{modelo}} de placa {{placa}} cadastrada com sucesso!"
+  },
+
+  "mapaPatio": {
+    "title": "Mapa do Pátio",
+    "mapaTab": "Mapa",
+    "listaTab": "Lista",
+    "cadastrarMotoButton": "+ Cadastrar Moto",
+    "searchPlaceholder": "Buscar por placa, modelo, status…",
+    "noMotosFound": "Nenhuma moto encontrada",
+    "alert": {
+      "motoMovedTitle": "Moto Movida",
+      "motoMovedMessage": "Nova posição: {{newX}}, {{newY}}\\nZona: {{zona}}",
+      "motoDetailsTitle": "Detalhes da Moto",
+      "motoDetailsMessage": "Placa: {{placa}}"
+    }
+  },
+
+  "footer": {
+    "copyright": "© 2025 Mottu Pátio App - Todos os direitos reservados.",
+    "version": "Versão 1.0.0"
+  },
+
+  "notificationService": {
+    "moto_created_title": "🏍️ Moto Cadastrada!",
+    "moto_created_body": "A moto {{1}} ({{2}}) foi cadastrada com sucesso.",
+    "moto_updated_title": "✏️ Moto Atualizada!",
+    "moto_updated_body": "A moto {{1}} ({{2}}) foi atualizada com sucesso.",
+    "moto_deleted_title": "🗑️ Moto Removida!",
+    "moto_deleted_body": "A moto {{1}} ({{2}}) foi removida do sistema.",
+    "rfid_alert_title_sem_leitura": "Alerta: Sem Leitura",
+    "rfid_alert_title_bateria_baixa": "Alerta: Bateria Baixa",
+    "rfid_alert_title_manutencao": "Alerta: Manutenção",
+    "rfid_alert_title_fora_area": "Alerta: Fora da Área",
+    "rfid_alert_title_default": "Alerta RFID",
+    "login_success_title": "👋 Bem-vindo!",
+    "login_success_body": "Olá {{1}}, você fez login com sucesso.",
+    "data_sync_title": "🔄 Dados Sincronizados",
+    "data_sync_body": "Seus dados foram sincronizados com sucesso.",
+    "offline_mode_title": "📱 Modo Offline",
+    "offline_mode_body": "Você está trabalhando offline. Os dados serão sincronizados quando a conexão for restabelecida.",
+    "notification_button_view_details": "Ver Detalhes",
+    "notification_button_view_alert": "Ver Alerta",
+    "notification_button_dismiss": "Dispensar"
+  },
+
+  "loginScreen": {
+    "subtitle": "Sistema de Gestão Inteligente de Pátio"
+  },
+
+  "languageSelector": {
+    "title": "Selecionar Idioma",
+    "languageChangedSuccessfully": "Idioma alterado para {{lang}} com sucesso!",
+    "languageChangeError": "Erro ao alterar idioma."
+  },
+
+  "aboutScreen": {
+    "title": "Sobre o Aplicativo",
+    "appName": "Mottu VisionTracker",
+    "subtitle": "Sistema de Gestão Inteligente de Pátio",
+    "versionInfo": "Informações da Versão",
+    "version": "Versão",
+    "buildHash": "Hash do Commit",
+    "buildDate": "Data da Compilação",
+    "developers": "Desenvolvedores",
+    "legal": "Informações Legais",
+    "license": "Licença",
+    "copyright": "Direitos Autorais"
+  },
+
+  "registerScreen": {
+    "title": "Criar Conta",
+    "subtitle": "Cadastre-se para acessar o sistema",
+    "accountCreated": "Conta criada com sucesso!",
+    "emailInUse": "Este email já está em uso. Tente outro email.",
+    "registrationError": "Ocorreu um erro durante o cadastro. Tente novamente.",
+    "namePlaceholder": "Digite seu nome completo",
+    "confirmPasswordPlaceholder": "Confirme sua senha"
+  },
+
+  "branches": {
+    "screenTitle": "Gerenciamento de Filiais",
+    "title": "Rede de Filiais",
+    "subtitle": "Gerencie todas as filiais da Mottu",
+    "filters": "Filtros",
+    "country": "País",
+    "state": "Estado",
+    "filterByCountryPlaceholder": "Filtrar por país",
+    "filterByStatePlaceholder": "Filtrar por estado",
+    "showingCountOfTotal": "Exibindo {{count}} de {{total}} filiais",
+
+    "total": "Total",
+    "available": "Disponível",
+    "maintenance": "Manutenção",
+    "rented": "Alugada",
+    "viewOnMap": "Ver no mapa",
+
+    "detailsTitle": "Detalhes da Filial",
+    "viewFullMap": "Ver mapa completo",
+    "fleetStatsTitle": "Estatísticas da Frota",
+    "totalVehicles": "Total de motos",
+    "availabilityRate": "Taxa de disponibilidade",
+    "viewYard": "Ver pátio",
+    "viewIoT": "Monitoramento IoT",
+
+    "aboutTitle": "Sobre o Gerenciamento de Filiais",
+    "aboutBody": "O sistema de gerenciamento de filiais permite visualizar e administrar todas as unidades da Mottu em diferentes localidades. Através desta interface, é possível monitorar o status da frota em cada filial, acessar informações detalhadas e navegar para funcionalidades específicas de cada unidade.",
+    "aboutBullet1": "Visualização centralizada de todas as filiais",
+    "aboutBullet2": "Estatísticas em tempo real da frota",
+    "aboutBullet3": "Acesso rápido ao mapa do pátio de cada filial",
+    "aboutBullet4": "Integração com sistema de monitoramento IoT"
+  },
+
+  "supervisor": {
+    "title": "Painel do Supervisor",
+    "subtitle": "Monitoramento de motos por setor",
+    "total": "Total",
+    "sectorsOverview": "Visão Geral dos Setores",
+    "yardMap": "Mapa do Pátio",
+    "viewMap": "Ver Mapa",
+
+    "sectorA": "Setor A",
+    "sectorB": "Setor B",
+    "sectorC": "Setor C",
+    "sectorD": "Setor D",
+
+    "oneMoto": "moto",
+    "manyMotos": "motos",
+
+    "motosInSector": "Motos no {{sector}}",
+    "allMotos": "Todas as Motos",
+    "noMotosInSector": "Nenhuma moto encontrada neste setor",
+    "noMotos": "Nenhuma moto cadastrada no sistema",
+    "lastUpdate": "Última atualização: {{time}}",
+
+    "motoAlert": {
+      "title": "Moto {{plate}}",
+      "body": "Modelo: {{model}}\nCor: {{color}}\nLocalização: {{sector}}\n\nHistórico:\n{{history}}"
+    }
+  },
+
+  "settings": {
+    "title": "Ajustes",
+    "appearance": "Aparência",
+    "darkTheme": "Tema Escuro",
+    "enabled": "Ativado",
+    "disabled": "Desativado",
+
+    "about": "Sobre o App",
+    "description": "Este é um protótipo para mapeamento de pátio da Mottu, permitindo visualizar e gerenciar a localização das motos no pátio de forma interativa.",
+
+    "interactiveMap": "Mapa Interativo",
+    "motoTracking": "Localização de Motos",
+    "organizedSectors": "Setores Organizados",
+
+    "language": "Idioma",
+    "changeLanguage": "Alterar idioma",
+    "themeAuto": "Automático",
+
+    "userSectionTitle": "Usuário",
+    "logoutTitle": "Sair",
+    "logoutMessage": "Tem certeza que deseja sair da sua conta?",
+    "logoutConfirm": "Sair",
+
+    "membersTitle": "Membros da equipe",
+    "rmsTitle": "RMs",
+    "namesTitle": "Nomes",
+
+    "accountTitle": "Conta",
+    "loggingOut": "Saindo...",
+    "logoutButton": "Sair da Conta",
+    "goToLogin": "Ir para Login"
+  }
+}
