@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  FlatList, 
-  Image, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  Image,
   Platform,
   Dimensions,
   Alert,
-  ListRenderItemInfo
+  ListRenderItemInfo,
 } from 'react-native';
 import { useMotoContext } from '../contexts/MotoContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import type { Moto } from '../contexts/MotoContext';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width > 500 ? width / 2 - 24 : width - 32;
-
 
 type SetorId = 'Setor A' | 'Setor B' | 'Setor C' | 'Setor D';
 
@@ -38,17 +38,19 @@ interface Estatisticas {
 export default function SupervisorScreen() {
   const { motos } = useMotoContext();
   const { colors, isDark } = useTheme();
+  const { t } = useTranslation();
+
   const [estatisticas, setEstatisticas] = useState<Estatisticas>({
     total: 0,
-    porSetor: { 'Setor A': 0, 'Setor B': 0, 'Setor C': 0, 'Setor D': 0 }
+    porSetor: { 'Setor A': 0, 'Setor B': 0, 'Setor C': 0, 'Setor D': 0 },
   });
   const [setorSelecionado, setSetorSelecionado] = useState<SetorId | null>(null);
 
   const setores: Setor[] = [
-    { id: 'Setor A', nome: 'Setor A', cor: '#3498db', icone: 'grid' },
-    { id: 'Setor B', nome: 'Setor B', cor: '#e74c3c', icone: 'grid' },
-    { id: 'Setor C', nome: 'Setor C', cor: '#2ecc71', icone: 'grid' },
-    { id: 'Setor D', nome: 'Setor D', cor: '#f39c12', icone: 'grid' },
+    { id: 'Setor A', nome: t('supervisor.sectorA'), cor: '#3498db', icone: 'grid' },
+    { id: 'Setor B', nome: t('supervisor.sectorB'), cor: '#e74c3c', icone: 'grid' },
+    { id: 'Setor C', nome: t('supervisor.sectorC'), cor: '#2ecc71', icone: 'grid' },
+    { id: 'Setor D', nome: t('supervisor.sectorD'), cor: '#f39c12', icone: 'grid' },
   ];
 
   const calcularZona = (x: number, y: number): SetorId => {
@@ -61,14 +63,17 @@ export default function SupervisorScreen() {
     }
   };
 
+  const getSetorNome = (setor: SetorId): string => {
+    return setores.find((s) => s.id === setor)?.nome || setor;
+  };
+
   useEffect(() => {
-    
     const novasEstatisticas: Estatisticas = {
       total: motos.length,
-      porSetor: { 'Setor A': 0, 'Setor B': 0, 'Setor C': 0, 'Setor D': 0 }
+      porSetor: { 'Setor A': 0, 'Setor B': 0, 'Setor C': 0, 'Setor D': 0 },
     };
 
-    motos.forEach(moto => {
+    motos.forEach((moto) => {
       const setor = calcularZona(moto.posX, moto.posY);
       novasEstatisticas.porSetor[setor]++;
     });
@@ -81,112 +86,153 @@ export default function SupervisorScreen() {
   };
 
   const handleMotoPress = (moto: Moto): void => {
+    const setor = calcularZona(moto.posX, moto.posY);
+
     Alert.alert(
-      `Moto ${moto.placa}`,
-      `Modelo: ${moto.modelo}\nCor: ${moto.cor}\nLocalização: ${calcularZona(moto.posX, moto.posY)}\n\nHistórico:\n${moto.historico.join('\n')}`,
-      [{ text: 'Fechar', style: 'cancel' }]
+      t('supervisor.motoAlert.title', { plate: moto.placa }),
+      t('supervisor.motoAlert.body', {
+        model: moto.modelo,
+        color: moto.cor,
+        sector: getSetorNome(setor),
+        history: moto.historico.join('\n'),
+      }),
+      [{ text: t('common.close'), style: 'cancel' }]
     );
   };
 
   const getMotosDoSetor = (setor: SetorId): Moto[] => {
-    return motos.filter(moto => calcularZona(moto.posX, moto.posY) === setor);
+    return motos.filter((moto) => calcularZona(moto.posX, moto.posY) === setor);
   };
 
   const getCorSetor = (setor: SetorId): string => {
-    return setores.find(s => s.id === setor)?.cor || colors.accent;
+    return setores.find((s) => s.id === setor)?.cor || colors.accent;
   };
 
-  const renderSetorCard = ({ item }: ListRenderItemInfo<Setor>): React.ReactElement => (
-    <TouchableOpacity 
-      style={[
-        styles.setorCard, 
-        { 
-          backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-          borderColor: item.cor + '80',
-          borderLeftWidth: 4,
-          width: CARD_WIDTH,
-        }
-      ]}
-      onPress={() => handleSetorPress(item.id)}
-    >
-      <View style={styles.setorHeader}>
-        <View style={[styles.setorIconContainer, { backgroundColor: item.cor + '30' }]}>
-          <Ionicons name={item.icone as any} size={24} color={item.cor} />
+  const renderSetorCard = ({ item }: ListRenderItemInfo<Setor>): React.ReactElement => {
+    const count = estatisticas.porSetor[item.id];
+    const motoLabel =
+      count === 1 ? t('supervisor.oneMoto') : t('supervisor.manyMotos');
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.setorCard,
+          {
+            backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+            borderColor: item.cor + '80',
+            borderLeftWidth: 4,
+            width: CARD_WIDTH,
+          },
+        ]}
+        onPress={() => handleSetorPress(item.id)}
+      >
+        <View style={styles.setorHeader}>
+          <View
+            style={[
+              styles.setorIconContainer,
+              { backgroundColor: item.cor + '30' },
+            ]}
+          >
+            <Ionicons name={item.icone as any} size={24} color={item.cor} />
+          </View>
+          <View style={styles.setorInfo}>
+            <Text style={[styles.setorNome, { color: colors.text }]}>
+              {item.nome}
+            </Text>
+            <Text style={[styles.setorContagem, { color: colors.text + '99' }]}>
+              {count} {motoLabel}
+            </Text>
+          </View>
         </View>
-        <View style={styles.setorInfo}>
-          <Text style={[styles.setorNome, { color: colors.text }]}>{item.nome}</Text>
-          <Text style={[styles.setorContagem, { color: colors.text + '99' }]}>
-            {estatisticas.porSetor[item.id]} {estatisticas.porSetor[item.id] === 1 ? 'moto' : 'motos'}
-          </Text>
+
+        <View style={styles.setorProgress}>
+          <View
+            style={[
+              styles.setorProgressBar,
+              {
+                backgroundColor: item.cor + '40',
+                width: `${
+                  (estatisticas.porSetor[item.id] /
+                    Math.max(estatisticas.total, 1)) *
+                  100
+                }%`,
+              },
+            ]}
+          />
         </View>
-      </View>
-      
-      <View style={styles.setorProgress}>
-        <View 
-          style={[
-            styles.setorProgressBar, 
-            { 
-              backgroundColor: item.cor + '40',
-              width: `${(estatisticas.porSetor[item.id] / Math.max(estatisticas.total, 1)) * 100}%` 
-            }
-          ]} 
-        />
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   const renderMotoItem = ({ item }: ListRenderItemInfo<Moto>): React.ReactElement => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[
-        styles.motoItem, 
-        { 
+        styles.motoItem,
+        {
           backgroundColor: colors.card,
-          borderLeftColor: getCorSetor(calcularZona(item.posX, item.posY))
-        }
+          borderLeftColor: getCorSetor(calcularZona(item.posX, item.posY)),
+        },
       ]}
       onPress={() => handleMotoPress(item)}
     >
       <View style={styles.motoIconContainer}>
-        <Image 
-          source={require('../../assets/mottu_moto.png')} 
-          style={styles.motoIcon} 
+        <Image
+          source={require('../../assets/mottu_moto.png')}
+          style={styles.motoIcon}
           resizeMode="contain"
         />
       </View>
       <View style={styles.motoInfo}>
-        <Text style={[styles.motoPlaca, { color: colors.text }]}>{item.placa}</Text>
-        <Text style={[styles.motoModelo, { color: colors.text + '99' }]}>{item.modelo} • {item.cor}</Text>
+        <Text style={[styles.motoPlaca, { color: colors.text }]}>
+          {item.placa}
+        </Text>
+        <Text style={[styles.motoModelo, { color: colors.text + '99' }]}>
+          {item.modelo} • {item.cor}
+        </Text>
       </View>
-      <Ionicons 
-        name="chevron-forward" 
-        size={20} 
-        color={colors.text + '60'} 
+      <Ionicons
+        name="chevron-forward"
+        size={20}
+        color={colors.text + '60'}
         style={styles.motoArrow}
       />
     </TouchableOpacity>
   );
 
   return (
-    <ScrollView 
+    <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       showsVerticalScrollIndicator={false}
     >
       {/* Cabeçalho */}
       <View style={styles.header}>
         <View>
-          <Text style={[styles.title, { color: colors.accent }]}>Painel do Supervisor</Text>
+          <Text style={[styles.title, { color: colors.accent }]}>
+            {t('supervisor.title')}
+          </Text>
           <Text style={[styles.subtitle, { color: colors.text + '99' }]}>
-            Monitoramento de motos por setor
+            {t('supervisor.subtitle')}
           </Text>
         </View>
-        <View style={[styles.totalContainer, { backgroundColor: colors.accent + '20' }]}>
-          <Text style={[styles.totalLabel, { color: colors.text + '99' }]}>Total</Text>
-          <Text style={[styles.totalValue, { color: colors.accent }]}>{estatisticas.total}</Text>
+        <View
+          style={[
+            styles.totalContainer,
+            { backgroundColor: colors.accent + '20' },
+          ]}
+        >
+          <Text style={[styles.totalLabel, { color: colors.text + '99' }]}>
+            {t('supervisor.total')}
+          </Text>
+          <Text style={[styles.totalValue, { color: colors.accent }]}>
+            {estatisticas.total}
+          </Text>
         </View>
       </View>
 
       {/* Resumo dos Setores */}
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Visão Geral dos Setores</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t('supervisor.sectorsOverview')}
+      </Text>
       <FlatList
         data={setores}
         renderItem={renderSetorCard}
@@ -200,47 +246,62 @@ export default function SupervisorScreen() {
       {/* Mapa Visual */}
       <View style={[styles.mapaContainer, { backgroundColor: colors.card }]}>
         <View style={styles.mapaHeader}>
-          <Text style={[styles.mapaTitle, { color: colors.text }]}>Mapa do Pátio</Text>
-          <TouchableOpacity 
+          <Text style={[styles.mapaTitle, { color: colors.text }]}>
+            {t('supervisor.yardMap')}
+          </Text>
+          <TouchableOpacity
             style={[styles.mapaButton, { backgroundColor: colors.accent + '20' }]}
             onPress={() => {}}
           >
-            <Text style={[styles.mapaButtonText, { color: colors.accent }]}>Ver Mapa</Text>
+            <Text style={[styles.mapaButtonText, { color: colors.accent }]}>
+              {t('supervisor.viewMap')}
+            </Text>
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.mapaGrid}>
-          {setores.map(setor => (
-            <TouchableOpacity 
+          {setores.map((setor) => (
+            <TouchableOpacity
               key={setor.id}
               style={[
                 styles.mapaSetor,
-                { 
+                {
                   backgroundColor: setor.cor + '30',
                   borderColor: setor.cor + '60',
-                }
+                },
               ]}
               onPress={() => handleSetorPress(setor.id)}
             >
-              <Text style={[styles.mapaSetorText, { color: colors.text }]}>{setor.nome.split(' ')[1]}</Text>
-              <Text style={[styles.mapaSetorCount, { color: setor.cor }]}>{estatisticas.porSetor[setor.id]}</Text>
+              {/* A, B, C, D — usando o id, não o nome traduzido */}
+              <Text style={[styles.mapaSetorText, { color: colors.text }]}>
+                {setor.id.split(' ')[1]}
+              </Text>
+              <Text
+                style={[styles.mapaSetorCount, { color: setor.cor }]}
+              >
+                {estatisticas.porSetor[setor.id]}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
 
-      {/* Lista de Motos por Setor */}
+      {/* Lista de Motos por Setor / Todas */}
       {setorSelecionado ? (
         <View style={styles.motosSection}>
           <View style={styles.motosHeader}>
             <Text style={[styles.motosTitle, { color: colors.text }]}>
-              Motos no {setorSelecionado}
+              {t('supervisor.motosInSector', {
+                sector: getSetorNome(setorSelecionado),
+              })}
             </Text>
             <TouchableOpacity onPress={() => setSetorSelecionado(null)}>
-              <Text style={[styles.motosReset, { color: colors.accent }]}>Voltar</Text>
+              <Text style={[styles.motosReset, { color: colors.accent }]}>
+                {t('common.back')}
+              </Text>
             </TouchableOpacity>
           </View>
-          
+
           {getMotosDoSetor(setorSelecionado).length > 0 ? (
             <FlatList
               data={getMotosDoSetor(setorSelecionado)}
@@ -251,9 +312,13 @@ export default function SupervisorScreen() {
             />
           ) : (
             <View style={[styles.emptyState, { backgroundColor: colors.card }]}>
-              <Ionicons name="alert-circle-outline" size={40} color={colors.text + '60'} />
+              <Ionicons
+                name="alert-circle-outline"
+                size={40}
+                color={colors.text + '60'}
+              />
               <Text style={[styles.emptyText, { color: colors.text }]}>
-                Nenhuma moto encontrada neste setor
+                {t('supervisor.noMotosInSector')}
               </Text>
             </View>
           )}
@@ -262,10 +327,10 @@ export default function SupervisorScreen() {
         <View style={styles.motosSection}>
           <View style={styles.motosHeader}>
             <Text style={[styles.motosTitle, { color: colors.text }]}>
-              Todas as Motos
+              {t('supervisor.allMotos')}
             </Text>
           </View>
-          
+
           {motos.length > 0 ? (
             <FlatList
               data={motos}
@@ -276,9 +341,13 @@ export default function SupervisorScreen() {
             />
           ) : (
             <View style={[styles.emptyState, { backgroundColor: colors.card }]}>
-              <Ionicons name="alert-circle-outline" size={40} color={colors.text + '60'} />
+              <Ionicons
+                name="alert-circle-outline"
+                size={40}
+                color={colors.text + '60'}
+              />
               <Text style={[styles.emptyText, { color: colors.text }]}>
-                Nenhuma moto cadastrada no sistema
+                {t('supervisor.noMotos')}
               </Text>
             </View>
           )}
@@ -288,7 +357,9 @@ export default function SupervisorScreen() {
       {/* Rodapé */}
       <View style={styles.footer}>
         <Text style={[styles.footerText, { color: colors.text + '60' }]}>
-          Última atualização: {new Date().toLocaleTimeString()}
+          {t('supervisor.lastUpdate', {
+            time: new Date().toLocaleTimeString(),
+          })}
         </Text>
       </View>
     </ScrollView>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,15 +7,15 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  TextInput
+  TextInput,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import useThemeColors from '../hooks/useThemeColors';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.9;
-
 
 interface Filial {
   id: string;
@@ -35,7 +35,6 @@ interface Filial {
   };
 }
 
-
 const filiaisSimuladas: Filial[] = [
   {
     id: 'fil001',
@@ -49,10 +48,7 @@ const filiaisSimuladas: Filial[] = [
     manutencao: 12,
     alugada: 30,
     imagem: 'https://via.placeholder.com/300x150?text=Filial+SP+Centro',
-    coordenadas: {
-      latitude: -23.5505,
-      longitude: -46.6333
-    }
+    coordenadas: { latitude: -23.5505, longitude: -46.6333 },
   },
   {
     id: 'fil002',
@@ -66,10 +62,7 @@ const filiaisSimuladas: Filial[] = [
     manutencao: 8,
     alugada: 35,
     imagem: 'https://via.placeholder.com/300x150?text=Filial+RJ',
-    coordenadas: {
-      latitude: -22.9068,
-      longitude: -43.1729
-    }
+    coordenadas: { latitude: -22.9068, longitude: -43.1729 },
   },
   {
     id: 'fil003',
@@ -83,10 +76,7 @@ const filiaisSimuladas: Filial[] = [
     manutencao: 5,
     alugada: 20,
     imagem: 'https://via.placeholder.com/300x150?text=Filial+BH',
-    coordenadas: {
-      latitude: -19.9167,
-      longitude: -43.9345
-    }
+    coordenadas: { latitude: -19.9167, longitude: -43.9345 },
   },
   {
     id: 'fil004',
@@ -100,10 +90,7 @@ const filiaisSimuladas: Filial[] = [
     manutencao: 3,
     alugada: 15,
     imagem: 'https://via.placeholder.com/300x150?text=Filial+Brasilia',
-    coordenadas: {
-      latitude: -15.7801,
-      longitude: -47.9292
-    }
+    coordenadas: { latitude: -15.7801, longitude: -47.9292 },
   },
   {
     id: 'fil005',
@@ -117,45 +104,42 @@ const filiaisSimuladas: Filial[] = [
     manutencao: 10,
     alugada: 25,
     imagem: 'https://via.placeholder.com/300x150?text=Filial+Mexico',
-    coordenadas: {
-      latitude: 19.4326,
-      longitude: -99.1332
-    }
-  }
+    coordenadas: { latitude: 19.4326, longitude: -99.1332 },
+  },
 ];
 
 export default function GerenciamentoFiliaisScreen() {
   const { colors } = useThemeColors();
   const router = useRouter();
-  const [filiais, setFiliais] = useState<Filial[]>(filiaisSimuladas);
-  const [filtroPais, setFiltroPais] = useState<string>('');
-  const [filtroEstado, setFiltroEstado] = useState<string>('');
+  const { t } = useTranslation();
+
+  const [filiais] = useState<Filial[]>(filiaisSimuladas);
+  const [filtroPais, setFiltroPais] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('');
   const [filialSelecionada, setFilialSelecionada] = useState<Filial | null>(null);
 
-  
-  const filiaisFiltradas = filiais.filter(filial => {
-    const matchPais = filtroPais ? filial.pais.toLowerCase().includes(filtroPais.toLowerCase()) : true;
-    const matchEstado = filtroEstado ? filial.estado.toLowerCase().includes(filtroEstado.toLowerCase()) : true;
+  const filiaisFiltradas = filiais.filter((filial) => {
+    const matchPais = filtroPais
+      ? filial.pais.toLowerCase().includes(filtroPais.toLowerCase())
+      : true;
+    const matchEstado = filtroEstado
+      ? filial.estado.toLowerCase().includes(filtroEstado.toLowerCase())
+      : true;
     return matchPais && matchEstado;
   });
 
-  
-  const selecionarFilial = (filial: Filial) => {
-    setFilialSelecionada(filial);
-  };
+  const selecionarFilial = (filial: Filial) => setFilialSelecionada(filial);
+  const limparSelecao = () => setFilialSelecionada(null);
 
-  
-  const limparSelecao = () => {
-    setFilialSelecionada(null);
-  };
-
-  
   const renderFilialCard = (filial: Filial) => {
     const disponibilidadePercentual = (filial.disponivel / filial.totalMotos) * 100;
-    const corDisponibilidade = disponibilidadePercentual > 70 ? colors.success :
-                              disponibilidadePercentual > 40 ? colors.warning :
-                              colors.error;
-    
+    const corDisponibilidade =
+      disponibilidadePercentual > 70
+        ? colors.success
+        : disponibilidadePercentual > 40
+        ? colors.warning
+        : colors.error;
+
     return (
       <TouchableOpacity
         key={filial.id}
@@ -165,197 +149,253 @@ export default function GerenciamentoFiliaisScreen() {
         <View style={styles.filialHeader}>
           <Text style={[styles.filialNome, { color: colors.text }]}>{filial.nome}</Text>
           <View style={[styles.filialPais, { backgroundColor: colors.primary }]}>
-            <Text style={[styles.filialPaisText, { color: colors.background }]}>
-              {filial.pais}
-            </Text>
+            <Text style={[styles.filialPaisText, { color: colors.background }]}>{filial.pais}</Text>
           </View>
         </View>
-        
+
         <Text style={[styles.filialEndereco, { color: colors.textSecondary }]}>
           {filial.endereco}, {filial.cidade} - {filial.estado}
         </Text>
-        
+
         <View style={styles.filialStats}>
           <View style={styles.filialStat}>
             <Text style={[styles.filialStatValue, { color: colors.text }]}>
               {filial.totalMotos}
             </Text>
             <Text style={[styles.filialStatLabel, { color: colors.textSecondary }]}>
-              Total
+              {t('branches.total')}
             </Text>
           </View>
-          
+
           <View style={styles.filialStat}>
             <Text style={[styles.filialStatValue, { color: corDisponibilidade }]}>
               {filial.disponivel}
             </Text>
             <Text style={[styles.filialStatLabel, { color: colors.textSecondary }]}>
-              Disponível
+              {t('branches.available')}
             </Text>
           </View>
-          
+
           <View style={styles.filialStat}>
             <Text style={[styles.filialStatValue, { color: colors.warning }]}>
               {filial.manutencao}
             </Text>
             <Text style={[styles.filialStatLabel, { color: colors.textSecondary }]}>
-              Manutenção
+              {t('branches.maintenance')}
             </Text>
           </View>
-          
+
           <View style={styles.filialStat}>
             <Text style={[styles.filialStatValue, { color: colors.accent }]}>
               {filial.alugada}
             </Text>
             <Text style={[styles.filialStatLabel, { color: colors.textSecondary }]}>
-              Alugada
+              {t('branches.rented')}
             </Text>
           </View>
         </View>
-        
+
         <View style={styles.filialFooter}>
           <FontAwesome5 name="map-marker-alt" size={16} color={colors.primary} />
           <Text style={[styles.filialFooterText, { color: colors.textSecondary }]}>
-            Ver no mapa
+            {t('branches.viewOnMap')}
           </Text>
         </View>
       </TouchableOpacity>
     );
   };
 
-  
   const renderFilialDetalhes = () => {
     if (!filialSelecionada) return null;
-    
-    const disponibilidadePercentual = (filialSelecionada.disponivel / filialSelecionada.totalMotos) * 100;
-    
+
+    const disponibilidadePercentual =
+      (filialSelecionada.disponivel / filialSelecionada.totalMotos) * 100;
+
     return (
       <View style={[styles.filialDetalhes, { backgroundColor: colors.card }]}>
         <View style={styles.filialDetalhesHeader}>
           <Text style={[styles.filialDetalhesTitle, { color: colors.text }]}>
-            Detalhes da Filial
+            {t('branches.detailsTitle')}
           </Text>
           <TouchableOpacity onPress={limparSelecao}>
             <FontAwesome5 name="times" size={20} color={colors.text} />
           </TouchableOpacity>
         </View>
-        
+
         <Text style={[styles.filialDetalhesNome, { color: colors.text }]}>
           {filialSelecionada.nome}
         </Text>
-        
+
         <Text style={[styles.filialDetalhesEndereco, { color: colors.textSecondary }]}>
-          {filialSelecionada.endereco}, {filialSelecionada.cidade} - {filialSelecionada.estado}, {filialSelecionada.pais}
+          {filialSelecionada.endereco}, {filialSelecionada.cidade} -{' '}
+          {filialSelecionada.estado}, {filialSelecionada.pais}
         </Text>
-        
+
         <View style={styles.filialDetalhesImageContainer}>
           <Image
             source={{ uri: filialSelecionada.imagem }}
             style={styles.filialDetalhesImage}
             resizeMode="cover"
           />
-          <View style={[styles.filialDetalhesMapOverlay, { backgroundColor: colors.primary }]}>
+          <View
+            style={[styles.filialDetalhesMapOverlay, { backgroundColor: colors.primary }]}
+          >
             <Text style={[styles.filialDetalhesMapText, { color: colors.background }]}>
-              Ver Mapa Completo
+              {t('branches.viewFullMap')}
             </Text>
           </View>
         </View>
-        
+
         <Text style={[styles.filialDetalhesSectionTitle, { color: colors.text }]}>
-          Estatísticas da Frota
+          {t('branches.fleetStatsTitle')}
         </Text>
-        
+
         <View style={styles.filialDetalhesStats}>
           <View style={styles.filialDetalhesStat}>
             <Text style={[styles.filialDetalhesStatValue, { color: colors.text }]}>
               {filialSelecionada.totalMotos}
             </Text>
-            <Text style={[styles.filialDetalhesStatLabel, { color: colors.textSecondary }]}>
-              Total de Motos
+            <Text
+              style={[styles.filialDetalhesStatLabel, { color: colors.textSecondary }]}
+            >
+              {t('branches.totalVehicles')}
             </Text>
           </View>
-          
+
           <View style={styles.filialDetalhesStat}>
             <Text style={[styles.filialDetalhesStatValue, { color: colors.success }]}>
               {disponibilidadePercentual.toFixed(0)}%
             </Text>
-            <Text style={[styles.filialDetalhesStatLabel, { color: colors.textSecondary }]}>
-              Taxa de Disponibilidade
+            <Text
+              style={[styles.filialDetalhesStatLabel, { color: colors.textSecondary }]}
+            >
+              {t('branches.availabilityRate')}
             </Text>
           </View>
         </View>
-        
+
         <View style={styles.filialDetalhesProgressContainer}>
-          <View style={[styles.filialDetalhesProgressBar, { backgroundColor: colors.border }]}>
+          <View
+            style={[styles.filialDetalhesProgressBar, { backgroundColor: colors.border }]}
+          >
             <View
               style={[
                 styles.filialDetalhesProgressFill,
-                { 
-                  width: `${(filialSelecionada.disponivel / filialSelecionada.totalMotos) * 100}%`,
-                  backgroundColor: colors.success
-                }
+                {
+                  width: `${
+                    (filialSelecionada.disponivel / filialSelecionada.totalMotos) * 100
+                  }%`,
+                  backgroundColor: colors.success,
+                },
               ]}
             />
             <View
               style={[
                 styles.filialDetalhesProgressFill,
-                { 
-                  width: `${(filialSelecionada.manutencao / filialSelecionada.totalMotos) * 100}%`,
+                {
+                  width: `${
+                    (filialSelecionada.manutencao / filialSelecionada.totalMotos) * 100
+                  }%`,
                   backgroundColor: colors.warning,
-                  left: `${(filialSelecionada.disponivel / filialSelecionada.totalMotos) * 100}%`
-                }
+                  left: `${
+                    (filialSelecionada.disponivel / filialSelecionada.totalMotos) * 100
+                  }%`,
+                },
               ]}
             />
             <View
               style={[
                 styles.filialDetalhesProgressFill,
-                { 
-                  width: `${(filialSelecionada.alugada / filialSelecionada.totalMotos) * 100}%`,
+                {
+                  width: `${
+                    (filialSelecionada.alugada / filialSelecionada.totalMotos) * 100
+                  }%`,
                   backgroundColor: colors.accent,
-                  left: `${((filialSelecionada.disponivel + filialSelecionada.manutencao) / filialSelecionada.totalMotos) * 100}%`
-                }
+                  left: `${
+                    ((filialSelecionada.disponivel + filialSelecionada.manutencao) /
+                      filialSelecionada.totalMotos) *
+                    100
+                  }%`,
+                },
               ]}
             />
           </View>
-          
+
           <View style={styles.filialDetalhesProgressLegend}>
             <View style={styles.filialDetalhesProgressLegendItem}>
-              <View style={[styles.filialDetalhesProgressLegendColor, { backgroundColor: colors.success }]} />
-              <Text style={[styles.filialDetalhesProgressLegendText, { color: colors.textSecondary }]}>
-                Disponível ({filialSelecionada.disponivel})
+              <View
+                style={[
+                  styles.filialDetalhesProgressLegendColor,
+                  { backgroundColor: colors.success },
+                ]}
+              />
+              <Text
+                style={[
+                  styles.filialDetalhesProgressLegendText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {t('branches.available')} ({filialSelecionada.disponivel})
               </Text>
             </View>
-            
+
             <View style={styles.filialDetalhesProgressLegendItem}>
-              <View style={[styles.filialDetalhesProgressLegendColor, { backgroundColor: colors.warning }]} />
-              <Text style={[styles.filialDetalhesProgressLegendText, { color: colors.textSecondary }]}>
-                Manutenção ({filialSelecionada.manutencao})
+              <View
+                style={[
+                  styles.filialDetalhesProgressLegendColor,
+                  { backgroundColor: colors.warning },
+                ]}
+              />
+              <Text
+                style={[
+                  styles.filialDetalhesProgressLegendText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {t('branches.maintenance')} ({filialSelecionada.manutencao})
               </Text>
             </View>
-            
+
             <View style={styles.filialDetalhesProgressLegendItem}>
-              <View style={[styles.filialDetalhesProgressLegendColor, { backgroundColor: colors.accent }]} />
-              <Text style={[styles.filialDetalhesProgressLegendText, { color: colors.textSecondary }]}>
-                Alugada ({filialSelecionada.alugada})
+              <View
+                style={[
+                  styles.filialDetalhesProgressLegendColor,
+                  { backgroundColor: colors.accent },
+                ]}
+              />
+              <Text
+                style={[
+                  styles.filialDetalhesProgressLegendText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {t('branches.rented')} ({filialSelecionada.alugada})
               </Text>
             </View>
           </View>
         </View>
-        
+
         <View style={styles.filialDetalhesButtons}>
           <TouchableOpacity
             style={[styles.filialDetalhesButton, { backgroundColor: colors.primary }]}
             onPress={() => router.push('/mapaPatio')}
           >
-            <Text style={[styles.filialDetalhesButtonText, { color: colors.background }]}>
-              Ver Pátio
+            <Text
+              style={[styles.filialDetalhesButtonText, { color: colors.background }]}
+            >
+              {t('branches.viewYard')}
             </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[styles.filialDetalhesButton, { backgroundColor: colors.accent }]}
             onPress={() => router.push('/monitoramentoIoT')}
           >
+            <Text
+              style={[styles.filialDetalhesButtonText, { color: colors.background }]}
+            >
+              {t('branches.viewIoT')}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -364,87 +404,89 @@ export default function GerenciamentoFiliaisScreen() {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Stack.Screen options={{ title: 'Gerenciamento de Filiais' }} />
-      
+      <Stack.Screen options={{ title: t('branches.screenTitle') }} />
+
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          Rede de Filiais
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Gerencie todas as filiais da Mottu
-        </Text>
-      </View>
-      
+  <Text style={[styles.title, { color: colors.text }]}>{t('branches.title')}</Text>
+  <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+    {t('branches.subtitle')}
+  </Text>
+</View>
+
       <View style={[styles.filtrosContainer, { backgroundColor: colors.card }]}>
         <Text style={[styles.filtrosTitle, { color: colors.text }]}>
-          Filtros
+          {t('branches.filters')}
         </Text>
-        
+
         <View style={styles.filtrosRow}>
           <View style={styles.filtroItem}>
             <Text style={[styles.filtroLabel, { color: colors.textSecondary }]}>
-              País
+              {t('branches.country')}
             </Text>
             <TextInput
-              style={[styles.filtroInput, { backgroundColor: colors.background, color: colors.text }]}
+              style={[
+                styles.filtroInput,
+                { backgroundColor: colors.background, color: colors.text },
+              ]}
               value={filtroPais}
               onChangeText={setFiltroPais}
-              placeholder="Filtrar por país"
+              placeholder={t('branches.filterByCountryPlaceholder')}
               placeholderTextColor={colors.textSecondary}
             />
           </View>
-          
+
           <View style={styles.filtroItem}>
             <Text style={[styles.filtroLabel, { color: colors.textSecondary }]}>
-              Estado
+              {t('branches.state')}
             </Text>
             <TextInput
-              style={[styles.filtroInput, { backgroundColor: colors.background, color: colors.text }]}
+              style={[
+                styles.filtroInput,
+                { backgroundColor: colors.background, color: colors.text },
+              ]}
               value={filtroEstado}
               onChangeText={setFiltroEstado}
-              placeholder="Filtrar por estado"
+              placeholder={t('branches.filterByStatePlaceholder')}
               placeholderTextColor={colors.textSecondary}
             />
           </View>
         </View>
-        
+
         <View style={styles.filtrosStats}>
           <Text style={[styles.filtrosStatsText, { color: colors.textSecondary }]}>
-            Exibindo {filiaisFiltradas.length} de {filiais.length} filiais
+            {t('branches.showingCountOfTotal', {
+              count: filiaisFiltradas.length,
+              total: filiais.length,
+            })}
           </Text>
         </View>
       </View>
-      
+
       {filialSelecionada ? (
         renderFilialDetalhes()
       ) : (
-        <View style={styles.filiaisGrid}>
-          {filiaisFiltradas.map(renderFilialCard)}
-        </View>
+        <View style={styles.filiaisGrid}>{filiaisFiltradas.map(renderFilialCard)}</View>
       )}
-      
+
       <View style={styles.infoContainer}>
         <Text style={[styles.infoTitle, { color: colors.text }]}>
-          Sobre o Gerenciamento de Filiais
+          {t('branches.aboutTitle')}
         </Text>
         <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-          O sistema de gerenciamento de filiais permite visualizar e administrar todas as 
-          unidades da Mottu em diferentes localidades. Através desta interface, é possível 
-          monitorar o status da frota em cada filial, acessar informações detalhadas e 
-          navegar para funcionalidades específicas de cada unidade.
+          {t('branches.aboutBody')}
         </Text>
         <View style={styles.bulletPoints}>
           <Text style={[styles.bulletPoint, { color: colors.textSecondary }]}>
-            • Visualização centralizada de todas as filiais
+            • {t('branches.aboutBullet1')}
           </Text>
           <Text style={[styles.bulletPoint, { color: colors.textSecondary }]}>
-            • Estatísticas em tempo real da frota
+            • {t('branches.aboutBullet2')}
           </Text>
           <Text style={[styles.bulletPoint, { color: colors.textSecondary }]}>
-            • Acesso rápido ao mapa do pátio de cada filial
+            • {t('branches.aboutBullet3')}
           </Text>
           <Text style={[styles.bulletPoint, { color: colors.textSecondary }]}>
-            • Integração com sistema de monitoramento IoT
+            • {t('branches.aboutBullet4')}
           </Text>
         </View>
       </View>

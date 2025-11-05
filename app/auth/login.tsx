@@ -1,5 +1,6 @@
 // app/auth/login.tsx
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -16,6 +17,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const { login, isLoading, error, clearError } = useAuth();
 
@@ -42,17 +44,17 @@ export default function LoginScreen() {
 
   const doLogin = async () => {
     clearError();
-    // validações simples
+
     if (!email.trim()) {
-      setEmailError('Informe seu email');
+      setEmailError(t('common.requiredField'));
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setEmailError('Email inválido');
+      setEmailError(t('common.invalidEmail'));
       return;
     }
     if (!password.trim()) {
-      setPasswordError('Informe sua senha');
+      setPasswordError(t('common.requiredField'));
       return;
     }
 
@@ -60,7 +62,6 @@ export default function LoginScreen() {
     if (res.success) {
       router.replace('/(tabs)');
     } else if (res.error) {
-      // erro já fica exposto, mas reforçamos visualmente
       setPasswordError(res.error);
     }
   };
@@ -77,9 +78,11 @@ export default function LoginScreen() {
       >
         {/* Logo / título */}
         <View style={styles.logoContainer}>
-          <Text style={[styles.logoText, { color: colors.text }]}>Mottu VisionTracker</Text>
+          <Text style={[styles.logoText, { color: colors.text }]}>
+            {t('common.appName')}
+          </Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Sistema de Gestão Inteligente de Pátio
+            {t('loginScreen.subtitle')}
           </Text>
         </View>
 
@@ -87,43 +90,59 @@ export default function LoginScreen() {
         <View style={styles.formContainer}>
           {/* Email */}
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Email</Text>
+            <Text style={[styles.label, { color: colors.text }]}>
+              {t('common.email')}
+            </Text>
             <TextInput
               style={[
                 styles.input,
                 emailFocused && styles.inputFocused,
                 !!emailError && styles.inputError,
-                { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface },
+                {
+                  color: colors.text,
+                  borderColor: colors.border,
+                  backgroundColor: colors.surface,
+                },
               ]}
               value={email}
               onChangeText={handleEmailChange}
               onFocus={() => setEmailFocused(true)}
               onBlur={() => setEmailFocused(false)}
-              placeholder="Digite seu email"
+              placeholder={t('common.emailPlaceholder')}
               placeholderTextColor={colors.textSecondary}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
               editable={!isLoading}
             />
-            {!!emailError && <Text style={[styles.errorText, { color: colors.error }]}>{emailError}</Text>}
+            {!!emailError && (
+              <Text style={[styles.errorText, { color: colors.error }]}>
+                {emailError}
+              </Text>
+            )}
           </View>
 
           {/* Senha */}
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Senha</Text>
+            <Text style={[styles.label, { color: colors.text }]}>
+              {t('common.password')}
+            </Text>
             <TextInput
               style={[
                 styles.input,
                 passwordFocused && styles.inputFocused,
                 !!passwordError && styles.inputError,
-                { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface },
+                {
+                  color: colors.text,
+                  borderColor: colors.border,
+                  backgroundColor: colors.surface,
+                },
               ]}
               value={password}
               onChangeText={handlePasswordChange}
               onFocus={() => setPasswordFocused(true)}
               onBlur={() => setPasswordFocused(false)}
-              placeholder="Digite sua senha"
+              placeholder={t('common.passwordPlaceholder')}
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
               autoCapitalize="none"
@@ -131,14 +150,25 @@ export default function LoginScreen() {
               editable={!isLoading}
             />
             {!!passwordError && (
-              <Text style={[styles.errorText, { color: colors.error }]}>{passwordError}</Text>
+              <Text style={[styles.errorText, { color: colors.error }]}>
+                {passwordError}
+              </Text>
             )}
           </View>
 
-          {/* Erro global (vindo do contexto) */}
-          {!!error && <Text style={[styles.errorText, { color: colors.error, textAlign: 'center' }]}>{error}</Text>}
+          {/* Erro global */}
+          {!!error && (
+            <Text
+              style={[
+                styles.errorText,
+                { color: colors.error, textAlign: 'center' },
+              ]}
+            >
+              {error}
+            </Text>
+          )}
 
-          {/* Ação */}
+          {/* Botão Login */}
           <TouchableOpacity
             style={[
               styles.button,
@@ -150,17 +180,25 @@ export default function LoginScreen() {
             {isLoading ? (
               <>
                 <ActivityIndicator color="#000" />
-                <Text style={[styles.buttonText, styles.loadingText]}>  Entrando…</Text>
+                <Text style={[styles.buttonText, styles.loadingText]}>
+                  {'  '}
+                  {t('common.loading')}
+                </Text>
               </>
             ) : (
-              <Text style={[styles.buttonText, { color: '#000' }]}>Entrar</Text>
+              <Text style={[styles.buttonText, { color: '#000' }]}>
+                {t('common.enter')}
+              </Text>
             )}
           </TouchableOpacity>
 
           {/* Link para cadastro */}
-          <TouchableOpacity style={styles.link} onPress={() => router.push('/auth/register')}>
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() => router.push('/auth/register')}
+          >
             <Text style={[styles.linkText, { color: colors.accent }]}>
-              Não tem conta? Cadastre-se
+              {t('common.noAccount')} {t('common.registerHere')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -191,7 +229,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 16,
   },
-  // <<< estas chaves faltavam, por isso o TS reclamava
   inputFocused: { borderWidth: 1.5 },
   inputError: { borderColor: '#ff4d4f' },
 

@@ -10,6 +10,7 @@ import React, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import ApiService from '../services/api';
+import NotificationService from '../services/notificationService';
 
 interface User {
   id: string;
@@ -114,6 +115,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           token: api.data.token,
         };
         await setSession(u);
+
+        // Registrar o token de push após o login bem-sucedido
+        const pushToken = await NotificationService.getPushToken();
+        if (pushToken && u.id) {
+          await ApiService.registerPushToken(pushToken, u.id);
+        }
+
         return { success: true };
       }
 

@@ -15,11 +15,10 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FontAwesome5 } from '@expo/vector-icons';
-
+import { useTranslation } from 'react-i18next';
 import { useMotoContext } from '../contexts/MotoContext';
 import useThemeColors from '../hooks/useThemeColors';
 import { Motos, Moto as MotoAPI } from '../services/motos';
-
 import MotoMarker from '../../components/MotoMarker';
 import ZonaMarker from '../../components/ZonaMarker';
 
@@ -27,60 +26,105 @@ const { width } = Dimensions.get('window');
 const PATIO_WIDTH = width * 0.9;
 const PATIO_HEIGHT = PATIO_WIDTH * 0.6;
 
+type ZonaId = 'A' | 'B' | 'C' | 'D';
+
 const zonas = [
-  { nome: 'Setor A', x: 0, y: 0 },
-  { nome: 'Setor B', x: PATIO_WIDTH / 2, y: 0 },
-  { nome: 'Setor C', x: 0, y: PATIO_HEIGHT / 2 },
-  { nome: 'Setor D', x: PATIO_WIDTH / 2, y: PATIO_HEIGHT / 2 },
+  { id: 'A' as ZonaId, x: 0, y: 0 },
+  { id: 'B' as ZonaId, x: PATIO_WIDTH / 2, y: 0 },
+  { id: 'C' as ZonaId, x: 0, y: PATIO_HEIGHT / 2 },
+  { id: 'D' as ZonaId, x: PATIO_WIDTH / 2, y: PATIO_HEIGHT / 2 },
 ];
 
 export default function MapaPatioScreen() {
+  const { t } = useTranslation();
   const { motos = [], moverMoto } = useMotoContext();
   const panResponders = useRef<{ [key: string]: any }>({});
   const router = useRouter();
   const { colors } = useThemeColors();
 
-  
   const [view, setView] = useState<'mapa' | 'lista'>('mapa');
-
-  
   const [motosApi, setMotosApi] = useState<MotoAPI[]>([]);
   const [q, setQ] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [loadingList, setLoadingList] = useState(true);
 
-  const calcularZona = (x: number, y: number): string => {
+  const calcularZona = (x: number, y: number): ZonaId => {
     if (y < PATIO_HEIGHT / 2) {
-      return x < PATIO_WIDTH / 2 ? 'Setor A' : 'Setor B';
+      return x < PATIO_WIDTH / 2 ? 'A' : 'B';
     } else {
-      return x < PATIO_WIDTH / 2 ? 'Setor C' : 'Setor D';
+      return x < PATIO_WIDTH / 2 ? 'C' : 'D';
     }
   };
 
-  
+  const getZonaLabel = (id: ZonaId) => {
+    // reaproveitando as traduções do supervisor
+    switch (id) {
+      case 'A':
+        return t('supervisor.sectorA');
+      case 'B':
+        return t('supervisor.sectorB');
+      case 'C':
+        return t('supervisor.sectorC');
+      case 'D':
+        return t('supervisor.sectorD');
+      default:
+        return id;
+    }
+  };
+
+  const getStatusLabel = (status?: string | null) => {
+    const s = (status || '').toUpperCase();
+    switch (s) {
+      case 'ATIVA':
+        return t('common.active');
+      case 'MANUTENCAO':
+        return t('common.maintenance');
+      case 'INATIVA':
+        return t('common.inactive');
+      default:
+        return status || '';
+    }
+  };
+
   useEffect(() => {
     motos.forEach((moto) => {
       if (!panResponders.current[moto.id]) {
         panResponders.current[moto.id] = PanResponder.create({
           onMoveShouldSetPanResponder: () => true,
           onPanResponderMove: (_, gesture) => {
-            moto.pan.setValue({ x: moto.posX + gesture.dx, y: moto.posY + gesture.dy });
+            moto.pan.setValue({
+              x: moto.posX + gesture.dx,
+              y: moto.posY + gesture.dy,
+            });
           },
           onPanResponderRelease: (_, gesture) => {
-            const newX = Math.max(0, Math.min(moto.posX + gesture.dx, PATIO_WIDTH - 60));
-            const newY = Math.max(0, Math.min(moto.posY + gesture.dy, PATIO_HEIGHT - 60));
+            const newX = Math.max(
+              0,
+              Math.min(moto.posX + gesture.dx, PATIO_WIDTH - 60)
+            );
+            const newY = Math.max(
+              0,
+              Math.min(moto.posY + gesture.dy, PATIO_HEIGHT - 60)
+            );
+
+            const zonaId = calcularZona(newX, newY);
+            const zonaLabel = getZonaLabel(zonaId);
+
             moverMoto(moto.id, newX, newY);
             Alert.alert(
-              'Moto Movida',
-              `Nova posição: ${newX.toFixed(0)}, ${newY.toFixed(0)}\nZona: ${calcularZona(newX, newY)}`
+              t('mapaPatio.alert.motoMovedTitle'),
+              t('mapaPatio.alert.motoMovedMessage', {
+                newX: newX.toFixed(0),
+                newY: newY.toFixed(0),
+                zona: zonaLabel,
+              })
             );
           },
         });
       }
     });
-  }, [motos, moverMoto]);
+  }, [motos, moverMoto, t]); // inclui t pra não ficar “stale” quando idioma mudar
 
- 
   const loadList = useCallback(async () => {
     setLoadingList(true);
     try {
@@ -105,7 +149,7 @@ export default function MapaPatioScreen() {
     const term = q.trim().toLowerCase();
     if (!term) return motosApi;
     return motosApi.filter(
-      m =>
+      (m) =>
         m.placa?.toLowerCase().includes(term) ||
         m.modelo?.toLowerCase().includes(term) ||
         m.status?.toLowerCase().includes(term)
@@ -114,9 +158,11 @@ export default function MapaPatioScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>Mapa do Pátio</Text>
+      <Text style={[styles.title, { color: colors.text }]}>
+        {t('mapaPatio.title')}
+      </Text>
 
-      {/* Toggle Mapa | Lista */}
+      {/* Alternar entre Mapa / Lista */}
       <View style={styles.toggleRow}>
         <Pressable
           onPress={() => setView('mapa')}
@@ -128,7 +174,14 @@ export default function MapaPatioScreen() {
             },
           ]}
         >
-          <Text style={[styles.toggleText, { color: view === 'mapa' ? '#000' : colors.text }]}>Mapa</Text>
+          <Text
+            style={[
+              styles.toggleText,
+              { color: view === 'mapa' ? '#000' : colors.text },
+            ]}
+          >
+            {t('mapaPatio.mapaTab')}
+          </Text>
         </Pressable>
 
         <Pressable
@@ -141,11 +194,17 @@ export default function MapaPatioScreen() {
             },
           ]}
         >
-          <Text style={[styles.toggleText, { color: view === 'lista' ? '#000' : colors.text }]}>Lista</Text>
+          <Text
+            style={[
+              styles.toggleText,
+              { color: view === 'lista' ? '#000' : colors.text },
+            ]}
+          >
+            {t('mapaPatio.listaTab')}
+          </Text>
         </Pressable>
       </View>
 
-      {/* Conteúdo */}
       {view === 'mapa' ? (
         <>
           <ImageBackground
@@ -155,8 +214,8 @@ export default function MapaPatioScreen() {
           >
             {zonas.map((zona) => (
               <ZonaMarker
-                key={zona.nome}
-                nome={zona.nome}
+                key={zona.id}
+                nome={getZonaLabel(zona.id)}
                 x={zona.x}
                 y={zona.y}
                 width={PATIO_WIDTH / 2}
@@ -170,7 +229,12 @@ export default function MapaPatioScreen() {
                 pan={moto.pan}
                 placa={moto.placa}
                 onPress={() =>
-                  Alert.alert('Detalhes da Moto', `Placa: ${moto.placa}`)
+                  Alert.alert(
+                    t('mapaPatio.alert.motoDetailsTitle'),
+                    t('mapaPatio.alert.motoDetailsMessage', {
+                      placa: moto.placa,
+                    })
+                  )
                 }
                 {...panResponders.current[moto.id]?.panHandlers}
               />
@@ -182,7 +246,9 @@ export default function MapaPatioScreen() {
             onPress={() => router.push('/cadastrarMoto')}
             activeOpacity={0.85}
           >
-            <Text style={[styles.botaoTexto, { color: colors.background }]}>+ Cadastrar Moto</Text>
+            <Text style={[styles.botaoTexto, { color: colors.background }]}>
+              {t('mapaPatio.cadastrarMotoButton')}
+            </Text>
           </TouchableOpacity>
         </>
       ) : (
@@ -191,14 +257,21 @@ export default function MapaPatioScreen() {
           <View
             style={[
               styles.searchBox,
-              { borderColor: colors.border, backgroundColor: colors.surface },
+              {
+                borderColor: colors.border,
+                backgroundColor: colors.surface,
+              },
             ]}
           >
-            <FontAwesome5 name="search" size={16} color={colors.textSecondary} />
+            <FontAwesome5
+              name="search"
+              size={16}
+              color={colors.textSecondary}
+            />
             <TextInput
               value={q}
               onChangeText={setQ}
-              placeholder="Buscar por placa, modelo, status…"
+              placeholder={t('mapaPatio.searchPlaceholder')}
               placeholderTextColor={colors.textSecondary}
               style={[styles.searchInput, { color: colors.text }]}
               returnKeyType="search"
@@ -215,16 +288,27 @@ export default function MapaPatioScreen() {
             contentContainerStyle={{ paddingBottom: 20 }}
             ListEmptyComponent={
               <View style={{ alignItems: 'center', padding: 24 }}>
-                <FontAwesome5 name="motorcycle" size={20} color={colors.textSecondary} />
-                <Text style={{ color: colors.textSecondary, marginTop: 8 }}>
-                  {loadingList ? 'Carregando…' : 'Nenhuma moto encontrada'}
+                <FontAwesome5
+                  name="motorcycle"
+                  size={20}
+                  color={colors.textSecondary}
+                />
+                <Text
+                  style={{ color: colors.textSecondary, marginTop: 8 }}
+                >
+                  {loadingList
+                    ? t('common.loading')
+                    : t('mapaPatio.noMotosFound')}
                 </Text>
               </View>
             }
             renderItem={({ item }) => (
               <Pressable
                 onPress={() =>
-                  router.push({ pathname: '/moto/[id]', params: { id: String(item.id) } })
+                  router.push({
+                    pathname: '/moto/[id]',
+                    params: { id: String(item.id) },
+                  })
                 }
                 style={({ pressed }) => [
                   styles.card,
@@ -236,18 +320,45 @@ export default function MapaPatioScreen() {
                 ]}
                 android_ripple={{ color: colors.border }}
               >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                  <View style={[styles.iconWrap, { backgroundColor: '#00000010' }]}>
-                    <FontAwesome5 name="motorcycle" size={18} color={colors.accent} />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 12,
+                  }}
+                >
+                  <View
+                    style={[
+                      styles.iconWrap,
+                      { backgroundColor: '#00000010' },
+                    ]}
+                  >
+                    <FontAwesome5
+                      name="motorcycle"
+                      size={18}
+                      color={colors.accent}
+                    />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.itemTitle, { color: colors.text }]}>
+                    <Text
+                      style={[
+                        styles.itemTitle,
+                        { color: colors.text },
+                      ]}
+                    >
                       {item.placa}
                     </Text>
-                    <Text style={{ color: colors.textSecondary }}>{item.modelo}</Text>
+                    <Text style={{ color: colors.textSecondary }}>
+                      {item.modelo}
+                    </Text>
                   </View>
-                  <Text style={{ fontWeight: '700', color: colors.textSecondary }}>
-                    {(item.status || '').toUpperCase()}
+                  <Text
+                    style={{
+                      fontWeight: '700',
+                      color: colors.textSecondary,
+                    }}
+                  >
+                    {getStatusLabel(item.status)}
                   </Text>
                 </View>
               </Pressable>
@@ -259,7 +370,9 @@ export default function MapaPatioScreen() {
             onPress={() => router.push('/cadastrarMoto')}
             activeOpacity={0.85}
           >
-            <Text style={[styles.botaoTexto, { color: colors.background }]}>+ Cadastrar Moto</Text>
+            <Text style={[styles.botaoTexto, { color: colors.background }]}>
+              {t('mapaPatio.cadastrarMotoButton')}
+            </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -270,8 +383,6 @@ export default function MapaPatioScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', paddingTop: 20 },
   title: { fontSize: 20, marginBottom: 10, fontWeight: 'bold' },
-
-  
   patio: {
     width: PATIO_WIDTH,
     height: PATIO_HEIGHT,
@@ -279,8 +390,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
   },
-
-  
   toggleRow: {
     flexDirection: 'row',
     gap: 8,
@@ -296,8 +405,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   toggleText: { fontWeight: '700' },
-
-  
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -323,8 +430,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemTitle: { fontSize: 16, fontWeight: '700' },
-
-  
   botaoCadastro: {
     marginTop: 20,
     paddingVertical: 12,

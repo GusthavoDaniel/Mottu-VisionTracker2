@@ -1,43 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import useThemeColors from '../hooks/useThemeColors';
 
-const exemplosAlertas = [
-  '⚠️ Moto fora do setor permitido!',
-  '🚫 Parada suspeita detectada!',
-  '📡 Perda de sinal da tag RFID!',
-  '🔒 Moto parada em zona restrita!',
-  '⚙️ Verificação obrigatória em 5 minutos!',
-];
+import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  RefreshControl,
+  ActivityIndicator,
+} from 'react-native';
+import useThemeColors from '../hooks/useThemeColors';
+import { Alertas, Alerta } from '../services/alertas';
 
 export default function HistoricoAlertasScreen() {
+  const { t } = useTranslation();
   const { colors } = useThemeColors();
-  const [alertas, setAlertas] = useState<string[]>([]);
-  const [index, setIndex] = useState(0);
+  const [alertas, setAlertas] = useState<Alerta[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadAlerts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await Alertas.list();
+      setAlertas(res);
+    } catch (error) {
+      console.error('Erro ao carregar alertas:', error);
+      // Pode adicionar um Alert.alert aqui para notificar o usuário
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setAlertas((prev) => [exemplosAlertas[index % exemplosAlertas.length], ...prev]);
-      setIndex((i) => i + 1);
-    }, 10000);
+    loadAlerts();
+  }, [loadAlerts]);
 
-    return () => clearInterval(interval);
-  }, [index]);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadAlerts();
+    setRefreshing(false);
+  }, [loadAlerts]);
+
+  if (loading) {
+    return (
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.accent} />
+        <Text style={{ color: colors.text, marginTop: 10 }}>{t('common.loading')}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: 'red' }]}>Histórico de Alertas</Text>
+      <Text style={[styles.title, { color: colors.text }]}>{t('common.alertHistory')}</Text>
       {alertas.length === 0 ? (
-        <Text style={[styles.empty, { color: colors.text }]}>Nenhum alerta ativo.</Text>
+        <View style={styles.center}>
+          <Text style={[styles.empty, { color: colors.textSecondary }]}>{t('common.noAlertsFound')}</Text>
+          <Text style={[styles.empty, { color: colors.textSecondary }]}>{t('common.pullToRefresh')}</Text>
+        </View>
       ) : (
         <FlatList
           data={alertas}
-          keyExtractor={(_, i) => i.toString()}
+          keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
-            <Text style={[styles.alertItem, { color: colors.text, borderBottomColor: colors.border }]}>
-              {item}
-            </Text>
+            <View style={[styles.alertItem, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.alertMessage, { color: colors.text }]}>{item.mensagem}</Text>
+              <Text style={[styles.alertType, { color: colors.textSecondary }]}>{t('common.alertType')}: {item.tipo}</Text>
+              {item.createdAt && (
+                <Text style={[styles.alertDate, { color: colors.textSecondary }]}>
+                  {new Date(item.createdAt).toLocaleString()}
+                </Text>
+              )}
+            </View>
           )}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         />
       )}
     </View>
@@ -50,15 +87,37 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
   },
   empty: {
     fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
   },
   alertItem: {
-    paddingVertical: 6,
-    borderBottomWidth: 1,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    marginBottom: 8,
+  },
+  alertMessage: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  alertType: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  alertDate: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
+

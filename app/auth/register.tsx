@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -16,67 +17,77 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function RegisterScreen() {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { register } = useAuth();
   const { colors } = useTheme();
   const router = useRouter();
 
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleRegister = async () => {
     // Validações
     if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      Alert.alert(t('common.error'), t('common.requiredField'));
       return;
     }
 
     if (name.trim().length < 2) {
-      Alert.alert('Erro', 'O nome deve ter pelo menos 2 caracteres.');
+      Alert.alert(t('common.error'), t('common.nameMinLength'));
       return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert('Erro', 'Por favor, insira um email válido.');
+      Alert.alert(t('common.error'), t('common.invalidEmail'));
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres.');
+      Alert.alert(t('common.error'), t('common.passwordMinLength'));
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Erro', 'As senhas não coincidem.');
+      Alert.alert(t('common.error'), t('common.passwordsMismatch'));
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
-      const success = await register(name.trim(), email.trim().toLowerCase(), password);
-      
+      const success = await register(
+        name.trim(),
+        email.trim().toLowerCase(),
+        password
+      );
+
       if (success) {
         Alert.alert(
-          'Sucesso', 
-          'Conta criada com sucesso!',
-          [{ text: 'OK', onPress: () => router.replace('/(tabs)') }]
+          t('common.success'),
+          t('registerScreen.accountCreated'),
+          [
+            {
+              text: t('common.ok'),
+              onPress: () => router.replace('/(tabs)'),
+            },
+          ]
         );
       } else {
-        Alert.alert('Erro', 'Este email já está em uso. Tente outro email.');
+        Alert.alert(t('common.error'), t('registerScreen.emailInUse'));
       }
     } catch (error) {
-      Alert.alert('Erro', 'Ocorreu um erro durante o cadastro. Tente novamente.');
+      Alert.alert(t('common.error'), t('registerScreen.registrationError'));
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   };
 
   const navigateToLogin = () => {
@@ -100,7 +111,7 @@ export default function RegisterScreen() {
     logo: {
       fontSize: 32,
       fontWeight: 'bold',
-      color: colors.primary,
+      color: colors.accent,
       marginBottom: 8,
     },
     subtitle: {
@@ -130,11 +141,11 @@ export default function RegisterScreen() {
       backgroundColor: colors.card,
     },
     inputFocused: {
-      borderColor: colors.primary,
+      borderColor: colors.accent,
       borderWidth: 2,
     },
     registerButton: {
-      backgroundColor: colors.primary,
+      backgroundColor: colors.accent,
       borderRadius: 8,
       padding: 16,
       alignItems: 'center',
@@ -159,7 +170,7 @@ export default function RegisterScreen() {
       fontSize: 14,
     },
     loginLink: {
-      color: colors.primary,
+      color: colors.accent,
       fontSize: 14,
       fontWeight: '600',
       marginLeft: 4,
@@ -186,29 +197,29 @@ export default function RegisterScreen() {
   });
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.logoContainer}>
-          <Text style={styles.logo}>Criar Conta</Text>
+          <Text style={styles.logo}>{t('registerScreen.title')}</Text>
           <Text style={styles.subtitle}>
-            Cadastre-se para acessar o sistema
+            {t('registerScreen.subtitle')}
           </Text>
         </View>
 
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Nome Completo</Text>
+            <Text style={styles.label}>{t('common.name')}</Text>
             <TextInput
               style={styles.input}
               value={name}
               onChangeText={setName}
-              placeholder="Digite seu nome completo"
+              placeholder={t('registerScreen.namePlaceholder')}
               placeholderTextColor={colors.textSecondary}
               autoCapitalize="words"
               editable={!isLoading}
@@ -216,12 +227,12 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t('common.email')}</Text>
             <TextInput
               style={styles.input}
               value={email}
               onChangeText={setEmail}
-              placeholder="Digite seu email"
+              placeholder={t('common.emailPlaceholder')}
               placeholderTextColor={colors.textSecondary}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -231,30 +242,30 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Senha</Text>
+            <Text style={styles.label}>{t('common.password')}</Text>
             <TextInput
               style={styles.input}
               value={password}
               onChangeText={setPassword}
-              placeholder="Digite sua senha"
+              placeholder={t('common.passwordPlaceholder')}
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
               editable={!isLoading}
             />
             <View style={styles.passwordRequirements}>
               <Text style={styles.requirementText}>
-                Mínimo de 6 caracteres
+                {t('common.passwordMinLength')}
               </Text>
             </View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Confirmar Senha</Text>
+            <Text style={styles.label}>{t('common.confirmPassword')}</Text>
             <TextInput
               style={styles.input}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
-              placeholder="Confirme sua senha"
+              placeholder={t('registerScreen.confirmPasswordPlaceholder')}
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
               editable={!isLoading}
@@ -264,7 +275,7 @@ export default function RegisterScreen() {
           <TouchableOpacity
             style={[
               styles.registerButton,
-              isLoading && styles.registerButtonDisabled
+              isLoading && styles.registerButtonDisabled,
             ]}
             onPress={handleRegister}
             disabled={isLoading}
@@ -272,22 +283,29 @@ export default function RegisterScreen() {
             {isLoading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator color="#FFFFFF" size="small" />
-                <Text style={styles.loadingText}>Criando conta...</Text>
+                <Text style={styles.loadingText}>
+                  {t('common.loading')}
+                </Text>
               </View>
             ) : (
-              <Text style={styles.registerButtonText}>Criar Conta</Text>
+              <Text style={styles.registerButtonText}>
+                {t('common.createAccount')}
+              </Text>
             )}
           </TouchableOpacity>
         </View>
 
         <View style={styles.loginContainer}>
-          <Text style={styles.loginText}>Já tem uma conta?</Text>
+          <Text style={styles.loginText}>
+            {t('common.alreadyHaveAccount')}
+          </Text>
           <TouchableOpacity onPress={navigateToLogin} disabled={isLoading}>
-            <Text style={styles.loginLink}>Faça login</Text>
+            <Text style={styles.loginLink}>
+              {t('common.loginHere')}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-

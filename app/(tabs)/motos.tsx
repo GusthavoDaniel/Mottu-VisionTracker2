@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -15,6 +16,7 @@ import { Motos, Moto } from '../services/motos';
 import useThemeColors from '../hooks/useThemeColors';
 
 export default function MotosList() {
+  const { t } = useTranslation();
   const { colors } = useThemeColors();
   const [data, setData] = useState<Moto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +33,11 @@ export default function MotosList() {
     }
   };
 
-  useFocusEffect(useCallback(() => { load(); }, []));
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -46,11 +52,10 @@ export default function MotosList() {
       (m) =>
         m.placa?.toLowerCase().includes(term) ||
         m.modelo?.toLowerCase().includes(term) ||
-        m.status?.toLowerCase().includes(term),
+        m.status?.toLowerCase().includes(term)
     );
   }, [q, data]);
 
-  // ---- FIX: service espera string -> normalizamos para string
   const remove = async (id: string | number) => {
     const strId = String(id);
     await Motos.remove(strId);
@@ -61,7 +66,9 @@ export default function MotosList() {
     return (
       <View style={[styles.center, { backgroundColor: colors.background }]}>
         <ActivityIndicator />
-        <Text style={{ color: colors.text, marginTop: 8 }}>Carregando motos…</Text>
+        <Text style={{ color: colors.text, marginTop: 8 }}>
+          {t('common.loading')}
+        </Text>
       </View>
     );
   }
@@ -70,10 +77,19 @@ export default function MotosList() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Header com busca */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <FontAwesome5 name="search" size={16} color={colors.textSecondary} />
+        <View
+          style={[
+            styles.searchBox,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <FontAwesome5
+            name="search"
+            size={16}
+            color={colors.textSecondary}
+          />
           <TextInput
-            placeholder="Buscar por placa, modelo, status…"
+            placeholder={t('common.searchPlaceholder')}
             placeholderTextColor={colors.textSecondary}
             value={q}
             onChangeText={setQ}
@@ -82,7 +98,7 @@ export default function MotosList() {
           />
         </View>
         <Text style={{ color: colors.textSecondary, marginTop: 6 }}>
-          {filtered.length} resultado{filtered.length !== 1 ? 's' : ''}
+          {t('common.results', { count: filtered.length })}
         </Text>
       </View>
 
@@ -91,16 +107,31 @@ export default function MotosList() {
         data={filtered}
         keyExtractor={(i) => String(i.id)}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         ListEmptyComponent={
           <View style={styles.center}>
-            <FontAwesome5 name="motorcycle" size={28} color={colors.textSecondary} />
-            <Text style={{ color: colors.textSecondary, marginTop: 8 }}>Nenhuma moto encontrada</Text>
+            <FontAwesome5
+              name="motorcycle"
+              size={28}
+              color={colors.textSecondary}
+            />
+            <Text
+              style={{ color: colors.textSecondary, marginTop: 8 }}
+            >
+              {t('common.noMotorcyclesFound')}
+            </Text>
           </View>
         }
         renderItem={({ item }) => (
           <Pressable
-            onPress={() => router.push({ pathname: '/moto/[id]', params: { id: String(item.id) } })}
+            onPress={() =>
+              router.push({
+                pathname: '/moto/[id]',
+                params: { id: String(item.id) },
+              })
+            }
             style={({ pressed }) => [
               styles.card,
               {
@@ -113,32 +144,65 @@ export default function MotosList() {
           >
             <View style={styles.row}>
               <View style={styles.iconWrap}>
-                <FontAwesome5 name="motorcycle" size={18} color={colors.accent} />
+                <FontAwesome5
+                  name="motorcycle"
+                  size={18}
+                  color={colors.accent}
+                />
               </View>
 
               <View style={{ flex: 1 }}>
-                <Text style={[styles.title, { color: colors.text }]}>{item.placa || '—'}</Text>
-                <Text style={{ color: colors.textSecondary }}>{item.modelo || '—'}</Text>
+                <Text
+                  style={[styles.title, { color: colors.text }]}
+                >
+                  {item.placa || '—'}
+                </Text>
+                <Text style={{ color: colors.textSecondary }}>
+                  {item.modelo || '—'}
+                </Text>
               </View>
 
               <StatusBadge status={item.status as any} colors={colors} />
             </View>
 
-            <View style={[styles.actions, { borderTopColor: colors.border }]}>
+            <View
+              style={[styles.actions, { borderTopColor: colors.border }]}
+            >
               <Pressable
-                onPress={() => router.push({ pathname: '/moto/[id]', params: { id: String(item.id) } })}
+                onPress={() =>
+                  router.push({
+                    pathname: '/moto/[id]',
+                    params: { id: String(item.id) },
+                  })
+                }
                 style={[styles.btn, { borderColor: colors.accent }]}
               >
-                <FontAwesome5 name="edit" size={14} color={colors.accent} />
-                <Text style={[styles.btnText, { color: colors.accent }]}>Editar</Text>
+                <FontAwesome5
+                  name="edit"
+                  size={14}
+                  color={colors.accent}
+                />
+                <Text
+                  style={[styles.btnText, { color: colors.accent }]}
+                >
+                  {t('common.edit')}
+                </Text>
               </Pressable>
 
               <Pressable
                 onPress={() => remove(item.id)}
                 style={[styles.btn, { borderColor: colors.error }]}
               >
-                <FontAwesome5 name="trash" size={14} color={colors.error} />
-                <Text style={[styles.btnText, { color: colors.error }]}>Excluir</Text>
+                <FontAwesome5
+                  name="trash"
+                  size={14}
+                  color={colors.error}
+                />
+                <Text
+                  style={[styles.btnText, { color: colors.error }]}
+                >
+                  {t('common.delete')}
+                </Text>
               </Pressable>
             </View>
           </Pressable>
@@ -148,10 +212,16 @@ export default function MotosList() {
       {/* FAB Cadastrar */}
       <Pressable
         onPress={() => router.push('/cadastrarMoto')}
-        style={[styles.fab, { backgroundColor: colors.accent, shadowColor: colors.accent }]}
+        style={[
+          styles.fab,
+          { backgroundColor: colors.accent, shadowColor: colors.accent },
+        ]}
         android_ripple={{ color: '#00000022', borderless: true }}
       >
         <FontAwesome5 name="plus" size={18} color="#000" />
+        <Text style={[styles.fabText, { color: '#000' }]}>
+          {t('common.addMoto')}
+        </Text>
       </Pressable>
     </View>
   );
@@ -164,18 +234,29 @@ function StatusBadge({
   status?: string;
   colors: Record<string, string>;
 }) {
-  const meta = (() => {
-    switch ((status || '').toUpperCase()) {
-      case 'ATIVA':
-        return { bg: colors.success, fg: '#000', label: 'ATIVA' };
-      case 'MANUTENCAO':
-        return { bg: colors.warning, fg: '#000', label: 'MANUTENÇÃO' };
-      case 'INATIVA':
-        return { bg: colors.error, fg: '#fff', label: 'INATIVA' };
-      default:
-        return { bg: colors.border, fg: colors.text, label: status || '—' };
-    }
-  })();
+  const { t } = useTranslation();
+
+  const c = {
+    success: colors?.success ?? '#2e7d32',
+    warning: colors?.warning ?? '#ed6c02',
+    error: colors?.error ?? '#d32f2f',
+    border: colors?.border ?? '#d9d9d9',
+    text: colors?.text ?? '#111',
+  };
+
+  const s = (status || '')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toUpperCase();
+
+  const meta =
+    s === 'ATIVA'
+      ? { bg: c.success, fg: '#000', label: t('common.active') }
+      : s === 'MANUTENCAO'
+      ? { bg: c.warning, fg: '#000', label: t('common.maintenance') }
+      : s === 'INATIVA'
+      ? { bg: c.error, fg: '#fff', label: t('common.inactive') }
+      : { bg: c.border, fg: c.text, label: status || '—' };
 
   return (
     <View
@@ -186,7 +267,13 @@ function StatusBadge({
         backgroundColor: meta.bg,
       }}
     >
-      <Text style={{ color: meta.fg, fontWeight: '700', fontSize: 12 }}>
+      <Text
+        style={{
+          color: meta.fg,
+          fontWeight: '700',
+          fontSize: 12,
+        }}
+      >
         {meta.label}
       </Text>
     </View>
@@ -194,8 +281,18 @@ function StatusBadge({
 }
 
 const styles = StyleSheet.create({
+  fabText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
   center: { alignItems: 'center', justifyContent: 'center', padding: 24 },
-  header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -218,8 +315,11 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   iconWrap: {
-    width: 36, height: 36, borderRadius: 18,
-    alignItems: 'center', justifyContent: 'center',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#00000008',
   },
   title: { fontSize: 16, fontWeight: '700' },
@@ -231,12 +331,25 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
-  btn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
+  btn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
   btnText: { fontSize: 13, fontWeight: '700' },
   fab: {
-    position: 'absolute', right: 20, bottom: 28,
-    width: 56, height: 56, borderRadius: 28,
-    alignItems: 'center', justifyContent: 'center',
+    position: 'absolute',
+    right: 20,
+    bottom: 28,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
     elevation: 6,
   },
 });

@@ -15,19 +15,29 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export default function ConfiguracoesScreen() {
   const { isDark, toggleTheme, colors } = useTheme();
   const { user, logout, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   const openLink = (url: string) => Linking.openURL(url);
 
   const handleLogout = () => {
-    Alert.alert('Sair', 'Tem certeza que deseja sair da sua conta?', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Sair', style: 'destructive', onPress: logout },
-    ]);
+    Alert.alert(
+      t('settings.logoutTitle'),
+      t('settings.logoutMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('settings.logoutConfirm'), style: 'destructive', onPress: logout },
+      ]
+    );
   };
+
+  // 🔹 valores vindos das variáveis de ambiente (definidas no app.json ou .env)
+  const buildHash = process.env.EXPO_PUBLIC_BUILD_HASH || 'N/A';
+  const buildDate = process.env.EXPO_PUBLIC_BUILD_DATE || new Date().toLocaleDateString();
 
   return (
     <ScrollView
@@ -41,46 +51,64 @@ export default function ConfiguracoesScreen() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={[styles.appName, { color: colors.accent }]}>Mottu VisionTracker</Text>
-        <Text style={[styles.appVersion, { color: colors.text }]}>Versão 1.0.0</Text>
+        <Text style={[styles.appName, { color: colors.accent }]}>
+          {t('common.appName')}
+        </Text>
+        <Text style={[styles.appVersion, { color: colors.text }]}>
+          {t('footer.version')}
+        </Text>
       </View>
 
-      {/* Seção do Usuário (se logado) */}
+      {/* Usuário logado */}
       {user && (
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={styles.cardHeader}>
             <Ionicons name="person-circle" size={24} color={colors.accent} />
-            <Text style={[styles.cardTitle, { color: colors.text }]}>Usuário</Text>
+            <Text style={[styles.cardTitle, { color: colors.text }]}>
+              {t('settings.userSectionTitle')}
+            </Text>
           </View>
 
           <View style={styles.userInfo}>
             <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Nome</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>{user.name}</Text>
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>
+                {t('common.name')}
+              </Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>
+                {user.name}
+              </Text>
             </View>
 
             <View style={styles.divider} />
 
             <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Email</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>{user.email}</Text>
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>
+                {t('common.email')}
+              </Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>
+                {user.email}
+              </Text>
             </View>
           </View>
         </View>
       )}
 
-      {/* Seção de Tema */}
+      {/* Tema */}
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <View style={styles.cardHeader}>
           <Ionicons name="color-palette" size={24} color={colors.accent} />
-          <Text style={[styles.cardTitle, { color: colors.text }]}>Aparência</Text>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>
+            {t('settings.appearance')}
+          </Text>
         </View>
 
         <View style={styles.settingRow}>
           <View>
-            <Text style={[styles.settingLabel, { color: colors.text }]}>Tema Escuro</Text>
+            <Text style={[styles.settingLabel, { color: colors.text }]}>
+              {t('settings.darkTheme')}
+            </Text>
             <Text style={[styles.settingDescription, { color: colors.text + '99' }]}>
-              {isDark ? 'Ativado' : 'Desativado'}
+              {isDark ? t('settings.enabled') : t('settings.disabled')}
             </Text>
           </View>
 
@@ -94,45 +122,66 @@ export default function ConfiguracoesScreen() {
         </View>
       </View>
 
-      {/* Seção Sobre o App */}
+      {/* Sobre o App */}
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <View style={styles.cardHeader}>
           <Ionicons name="information-circle" size={24} color={colors.accent} />
-          <Text style={[styles.cardTitle, { color: colors.text }]}>Sobre o App</Text>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>
+            {t('settings.about')}
+          </Text>
         </View>
 
         <Text style={[styles.aboutText, { color: colors.text }]}>
-          Este é um protótipo para mapeamento de pátio da Mottu, permitindo visualizar e gerenciar a
-          localização das motos no pátio de forma interativa.
+          {t('settings.description')}
         </Text>
 
         <View style={styles.featureContainer}>
           <View style={styles.featureItem}>
             <Ionicons name="map" size={22} color={colors.accent} />
-            <Text style={[styles.featureText, { color: colors.text }]}>Mapa Interativo</Text>
+            <Text style={[styles.featureText, { color: colors.text }]}>
+              {t('settings.interactiveMap')}
+            </Text>
           </View>
 
           <View style={styles.featureItem}>
             <Ionicons name="locate" size={22} color={colors.accent} />
-            <Text style={[styles.featureText, { color: colors.text }]}>Localização de Motos</Text>
+            <Text style={[styles.featureText, { color: colors.text }]}>
+              {t('settings.motoTracking')}
+            </Text>
           </View>
 
           <View style={styles.featureItem}>
             <Ionicons name="grid" size={22} color={colors.accent} />
-            <Text style={[styles.featureText, { color: colors.text }]}>Setores Organizados</Text>
+            <Text style={[styles.featureText, { color: colors.text }]}>
+              {t('settings.organizedSectors')}
+            </Text>
           </View>
+        </View>
+
+        {/* 🔹 Info de build e commit */}
+        <View style={styles.buildInfo}>
+          <Text style={[styles.buildText, { color: colors.textSecondary }]}>
+            {t('aboutScreen.buildHash')}: <Text style={styles.bold}>{buildHash}</Text>
+          </Text>
+          <Text style={[styles.buildText, { color: colors.textSecondary }]}>
+            {t('aboutScreen.buildDate')}: <Text style={styles.bold}>{buildDate}</Text>
+          </Text>
         </View>
       </View>
 
-      {/* Campos para RMs e Nomes */}
+      {/* Membros / RMs */}
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <View style={styles.cardHeader}>
           <Ionicons name="people" size={24} color={colors.accent} />
-          <Text style={[styles.cardTitle, { color: colors.text }]}>Registros de Membros</Text>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>
+            {t('settings.membersTitle')}
+          </Text>
         </View>
 
         <View style={styles.rmContainer}>
-          <Text style={[styles.rmSectionTitle, { color: colors.text }]}>RMs</Text>
+          <Text style={[styles.rmSectionTitle, { color: colors.text }]}>
+            {t('settings.rmsTitle')}
+          </Text>
 
           <View style={styles.infoRow}>
             <Text style={[styles.infoLabel, { color: colors.text + '99' }]}>RM 1</Text>
@@ -157,34 +206,44 @@ export default function ConfiguracoesScreen() {
         <View style={styles.spacer} />
 
         <View style={styles.rmContainer}>
-          <Text style={[styles.rmSectionTitle, { color: colors.text }]}>Nomes</Text>
+          <Text style={[styles.rmSectionTitle, { color: colors.text }]}>
+            {t('settings.namesTitle')}
+          </Text>
 
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: colors.text + '99' }]}>Nome 1</Text>
-            <Text style={[styles.infoValue, { color: colors.text }]}>Gusthavo Daniel de Souza</Text>
+            <Text style={[styles.infoLabel, { color: colors.text + '99' }]}>1</Text>
+            <Text style={[styles.infoValue, { color: colors.text }]}>
+              Gusthavo Daniel de Souza
+            </Text>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: colors.text + '99' }]}>Nome 2</Text>
-            <Text style={[styles.infoValue, { color: colors.text }]}>Guilherme Damasio Roselli</Text>
+            <Text style={[styles.infoLabel, { color: colors.text + '99' }]}>2</Text>
+            <Text style={[styles.infoValue, { color: colors.text }]}>
+              Guilherme Damasio Roselli
+            </Text>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: colors.text + '99' }]}>Nome 3</Text>
-            <Text style={[styles.infoValue, { color: colors.text }]}>Lucas Miranda Leite</Text>
+            <Text style={[styles.infoLabel, { color: colors.text + '99' }]}>3</Text>
+            <Text style={[styles.infoValue, { color: colors.text }]}>
+              Lucas Miranda Leite
+            </Text>
           </View>
         </View>
       </View>
 
-      {/* Conta / Ações */}
+      {/* Conta */}
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <View style={styles.cardHeader}>
           <Ionicons name="settings" size={22} color={colors.accent} />
-          <Text style={[styles.cardTitle, { color: colors.text }]}>Conta</Text>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>
+            {t('settings.accountTitle')}
+          </Text>
         </View>
 
         {user ? (
@@ -194,7 +253,9 @@ export default function ConfiguracoesScreen() {
             disabled={isLoading}
           >
             <Ionicons name="log-out-outline" size={20} color="#FFFFFF" />
-            <Text style={styles.logoutText}>{isLoading ? 'Saindo...' : 'Sair da Conta'}</Text>
+            <Text style={styles.logoutText}>
+              {isLoading ? t('settings.loggingOut') : t('settings.logoutButton')}
+            </Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
@@ -202,7 +263,9 @@ export default function ConfiguracoesScreen() {
             onPress={() => router.replace('/auth/login')}
           >
             <Ionicons name="log-in-outline" size={20} color="#000" />
-            <Text style={[styles.logoutText, { color: '#000' }]}>Ir para Login</Text>
+            <Text style={[styles.logoutText, { color: '#000' }]}>
+              {t('settings.goToLogin')}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -210,7 +273,7 @@ export default function ConfiguracoesScreen() {
       {/* Rodapé */}
       <View style={styles.footer}>
         <Text style={[styles.footerText, { color: colors.text + '80' }]}>
-          © 2025 Mottu Rotas - Todos os direitos reservados
+          {t('footer.copyright')}
         </Text>
 
         <View style={styles.socialContainer}>
@@ -260,8 +323,6 @@ const styles = StyleSheet.create({
   rmContainer: { marginTop: 8 },
   rmSectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
   spacer: { height: 20 },
-
-  
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -272,7 +333,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   logoutText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
-
+  buildInfo: { marginTop: 10 },
+  buildText: { fontSize: 13, marginBottom: 4 },
+  bold: { fontWeight: 'bold' },
   footer: { marginTop: 8, marginBottom: 24, alignItems: 'center' },
   footerText: { fontSize: 13, marginBottom: 12 },
   socialContainer: { flexDirection: 'row', justifyContent: 'center' },

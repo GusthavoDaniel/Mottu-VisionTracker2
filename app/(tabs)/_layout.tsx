@@ -3,10 +3,12 @@ import { Tabs, useRouter } from 'expo-router';
 import { FontAwesome5 } from '@expo/vector-icons';
 import useThemeColors from '../hooks/useThemeColors';
 import BackButton from '../components/BackButton';
+import { useTranslation } from 'react-i18next';
 
 export default function TabsLayout() {
   const { colors } = useThemeColors();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const headerLeft = () => (router.canGoBack() ? <BackButton /> : null);
 
@@ -19,50 +21,76 @@ export default function TabsLayout() {
         headerStyle: { backgroundColor: colors.background },
         headerTintColor: colors.text,
         headerTitleStyle: { color: colors.text },
-        tabBarStyle: { backgroundColor: colors.background, borderTopColor: colors.border },
-        headerLeft, 
+        tabBarStyle: {
+          backgroundColor: colors.background,
+          borderTopColor: colors.border,
+        },
+        headerLeft,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color }) => <FontAwesome5 size={24} name="tachometer-alt" color={color} />,
+          title: t('common.dashboard'),
+          tabBarLabel: t('common.dashboard'),
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 size={24} name="tachometer-alt" color={color} />
+          ),
         }}
       />
+
       <Tabs.Screen
         name="mapaPatio"
         options={{
-          title: 'Mapa Pátio',
-          tabBarIcon: ({ color }) => <FontAwesome5 size={24} name="map-marked-alt" color={color} />,
+          title: t('common.patioMap'),
+          tabBarLabel: t('common.patioMap'),
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 size={24} name="map-marked-alt" color={color} />
+          ),
         }}
       />
+
       <Tabs.Screen
         name="gerenciamentoFiliais"
         options={{
-          title: 'Filiais',
-          tabBarIcon: ({ color }) => <FontAwesome5 size={24} name="building" color={color} />,
+          title: t('branches.title'),
+          tabBarLabel: t('branches.title'),
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 size={24} name="building" color={color} />
+          ),
         }}
       />
+
       <Tabs.Screen
         name="historicoAlertas"
         options={{
-          title: 'Alertas',
-          tabBarIcon: ({ color }) => <FontAwesome5 size={24} name="bell" color={color} />,
+          title: t('common.alertHistory'),
+          tabBarLabel: t('common.alertHistory'),
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 size={24} name="bell" color={color} />
+          ),
         }}
       />
+
       <Tabs.Screen
         name="supervisor"
         options={{
-          title: 'Supervisor',
-          tabBarIcon: ({ color }) => <FontAwesome5 size={24} name="user-shield" color={color} />,
+          title: t('supervisor.title'),
+          tabBarLabel: t('supervisor.title'),
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 size={24} name="user-shield" color={color} />
+          ),
         }}
       />
+
       <Tabs.Screen
         name="configuracoes"
         options={{
-          title: 'Ajustes',
-          tabBarIcon: ({ color }) => <FontAwesome5 size={24} name="cog" color={color} />,
+          title: t('settings.title'),
+          tabBarLabel: t('settings.title'),
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 size={24} name="cog" color={color} />
+          ),
         }}
       />
 
