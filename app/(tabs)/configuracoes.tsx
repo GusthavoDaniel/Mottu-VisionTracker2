@@ -35,7 +35,7 @@ export default function ConfiguracoesScreen() {
     );
   };
 
-  // 🔹 valores vindos das variáveis de ambiente (definidas no app.json ou .env)
+  
   const buildHash = process.env.EXPO_PUBLIC_BUILD_HASH || 'N/A';
   const buildDate = process.env.EXPO_PUBLIC_BUILD_DATE || new Date().toLocaleDateString();
 
