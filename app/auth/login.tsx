@@ -17,7 +17,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();          // 🔹 agora pegamos o i18n também
   const { colors } = useTheme();
   const { login, isLoading, error, clearError } = useAuth();
 
@@ -66,6 +66,12 @@ export default function LoginScreen() {
     }
   };
 
+  const changeLang = (lang: 'pt' | 'en' | 'es') => {
+    i18n.changeLanguage(lang);
+  };
+
+  const currentLang = i18n.language?.slice(0, 2) as 'pt' | 'en' | 'es';
+
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -84,6 +90,39 @@ export default function LoginScreen() {
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             {t('loginScreen.subtitle')}
           </Text>
+
+          {/* 🔹 Seletor de idioma */}
+          <View style={styles.langRow}>
+            {[
+              { code: 'pt', label: 'PT' },
+              { code: 'en', label: 'EN' },
+              { code: 'es', label: 'ES' },
+            ].map(({ code, label }) => {
+              const active = currentLang === code;
+              return (
+                <TouchableOpacity
+                  key={code}
+                  onPress={() => changeLang(code as any)}
+                  style={[
+                    styles.langButton,
+                    {
+                      backgroundColor: active ? colors.accent : 'transparent',
+                      borderColor: colors.border,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={{
+                      color: active ? '#000' : colors.text,
+                      fontWeight: active ? '700' : '500',
+                    }}
+                  >
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
 
         {/* Form */}
@@ -213,10 +252,24 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
     marginTop: 48,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   logoText: { fontSize: 22, fontWeight: '800' },
   subtitle: { marginTop: 4, fontSize: 14 },
+
+  // 🔹 estilos do seletor de idioma
+  langRow: {
+    flexDirection: 'row',
+    marginTop: 12,
+    gap: 8,
+  },
+  langButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+
   formContainer: { paddingHorizontal: 20, paddingTop: 8 },
 
   inputContainer: { marginBottom: 16 },
