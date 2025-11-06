@@ -398,7 +398,14 @@ class ApiService {
 
   
   async healthCheck(): Promise<ApiResponse<any>> {
-    return this.makeRequest('/health');
+    return this.makeRequest("/health");
+  }
+
+  async registerPushToken(token: string, userId: string): Promise<ApiResponse<void>> {
+    return this.makeRequest("/notifications/register-token", {
+      method: "POST",
+      body: JSON.stringify({ token, userId }),
+    });
   }
 }
 

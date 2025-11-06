@@ -25,7 +25,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-localization"
     ],
     "scheme": "mottuvisiontracker",
     "sdkVersion": "53.0.0"

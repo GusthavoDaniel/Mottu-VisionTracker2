@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { useMotoContext } from './contexts/MotoContext';
 import useThemeColors from './hooks/useThemeColors';
-
 
 type Periodo = '7d' | '30d' | 'all';
 
@@ -88,6 +88,7 @@ function BarRow({
 }
 
 export default function RelatoriosScreen() {
+  const { t } = useTranslation();
   const { colors, isDark } = useThemeColors();
   const { motos, alertas, isLoading, isLoadingAlertas } = useMotoContext();
 
@@ -170,7 +171,7 @@ export default function RelatoriosScreen() {
     >
       <Stack.Screen
         options={{
-          title: 'Relatórios',
+          title: t('common.reports'),
           headerStyle: { backgroundColor: colors.background },
           headerTintColor: colors.text,
         }}
@@ -180,6 +181,13 @@ export default function RelatoriosScreen() {
       <View style={styles.segment}>
         {(['7d', '30d', 'all'] as Periodo[]).map((p) => {
           const active = periodo === p;
+          const label =
+            p === '7d'
+              ? t('reportsScreen.period7d')
+              : p === '30d'
+              ? t('reportsScreen.period30d')
+              : t('reportsScreen.periodAll');
+
           return (
             <Pressable
               key={p}
@@ -192,8 +200,13 @@ export default function RelatoriosScreen() {
                 },
               ]}
             >
-              <Text style={{ fontWeight: '700', color: active ? (isDark ? '#000' : '#000') : colors.text }}>
-                {p === '7d' ? '7 dias' : p === '30d' ? '30 dias' : 'Tudo'}
+              <Text
+                style={{
+                  fontWeight: '700',
+                  color: active ? '#000' : colors.text,
+                }}
+              >
+                {label}
               </Text>
             </Pressable>
           );
@@ -202,25 +215,55 @@ export default function RelatoriosScreen() {
 
       {/* KPIs */}
       <View style={styles.grid}>
-        <StatCard icon="warehouse" color={ACCENT} label="Total no Pátio" value={total} border={ACCENT} />
-        <StatCard icon="tools" color={WARN} label="Manutenção" value={manutencao} border={WARN} />
-        <StatCard icon="check-circle" color={ACCENT} label="Ativas" value={ativas} border={ACCENT} />
-        <StatCard icon="ban" color={DANGER} label="Inativas" value={inativas} border={DANGER} />
+        <StatCard
+          icon="warehouse"
+          color={ACCENT}
+          label={t('reportsScreen.totalInYard')}
+          value={total}
+          border={ACCENT}
+        />
+        <StatCard
+          icon="tools"
+          color={WARN}
+          label={t('reportsScreen.maintenance')}
+          value={manutencao}
+          border={WARN}
+        />
+        <StatCard
+          icon="check-circle"
+          color={ACCENT}
+          label={t('reportsScreen.active')}
+          value={ativas}
+          border={ACCENT}
+        />
+        <StatCard
+          icon="ban"
+          color={DANGER}
+          label={t('reportsScreen.inactive')}
+          value={inativas}
+          border={DANGER}
+        />
       </View>
 
       {/* Loading */}
       {loading && (
         <View style={{ paddingVertical: 24, alignItems: 'center' }}>
           <ActivityIndicator />
-          <Text style={{ color: colors.textSecondary, marginTop: 8 }}>Carregando dados…</Text>
+          <Text style={{ color: colors.textSecondary, marginTop: 8 }}>
+            {t('common.loading')}
+          </Text>
         </View>
       )}
 
       {/* Motos por Modelo */}
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Motos por Modelo (Top 6)</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t('reportsScreen.byModelTitle')}
+      </Text>
       <View style={[styles.card, { backgroundColor: MUTED, borderColor: colors.border }]}>
         {modelosTop.length === 0 ? (
-          <Text style={{ color: colors.textSecondary }}>Sem dados para o período.</Text>
+          <Text style={{ color: colors.textSecondary }}>
+            {t('reportsScreen.noDataPeriod')}
+          </Text>
         ) : (
           modelosTop.map(([model, count]) => (
             <BarRow
@@ -237,10 +280,14 @@ export default function RelatoriosScreen() {
       </View>
 
       {/* Alertas por Tipo */}
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Alertas por Tipo</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t('reportsScreen.alertsByTypeTitle')}
+      </Text>
       <View style={[styles.card, { backgroundColor: MUTED, borderColor: colors.border }]}>
         {alertasPorTipo.length === 0 ? (
-          <Text style={{ color: colors.textSecondary }}>Sem alertas no período.</Text>
+          <Text style={{ color: colors.textSecondary }}>
+            {t('reportsScreen.noAlertsPeriod')}
+          </Text>
         ) : (
           alertasPorTipo.map(([tipo, count]) => (
             <BarRow
@@ -257,46 +304,64 @@ export default function RelatoriosScreen() {
       </View>
 
       {/* Amostra de Motos */}
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Amostra de Motos</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+        {t('reportsScreen.sampleTitle')}
+      </Text>
       <View style={[styles.table, { backgroundColor: MUTED, borderColor: colors.border }]}>
         <View style={[styles.tr, styles.trHead, { borderColor: colors.border }]}>
-          <Text style={[styles.th, { color: colors.textSecondary }]}>Placa</Text>
-          <Text style={[styles.th, { color: colors.textSecondary, flex: 1 }]}>Modelo</Text>
-          <Text style={[styles.th, { color: colors.textSecondary }]}>Status</Text>
+          <Text style={[styles.th, { color: colors.textSecondary }]}>
+            {t('common.plate')}
+          </Text>
+          <Text style={[styles.th, { color: colors.textSecondary, flex: 1 }]}>
+            {t('common.model')}
+          </Text>
+          <Text style={[styles.th, { color: colors.textSecondary }]}>
+            {t('common.status')}
+          </Text>
         </View>
 
         {amostra.length === 0 ? (
           <View style={[styles.tr, { borderColor: colors.border }]}>
-            <Text style={[styles.td, { color: colors.textSecondary }]}>Sem registros.</Text>
+            <Text style={[styles.td, { color: colors.textSecondary }]}>
+              {t('reportsScreen.noRecords')}
+            </Text>
           </View>
         ) : (
-          amostra.map((m) => (
-            <View key={m.id} style={[styles.tr, { borderColor: colors.border }]}>
-              <Text style={[styles.td, { color: colors.text, fontWeight: '700' }]}>{m.placa}</Text>
-              <Text style={[styles.td, { color: colors.text, flex: 1 }]}>{m.modelo || '—'}</Text>
-              <Text
-                style={[
-                  styles.badge,
-                  {
-                    backgroundColor:
-                      normalizeStatus((m as any).status) === 'MANUTENCAO'
-                        ? `${WARN}22`
-                        : normalizeStatus((m as any).status) === 'INATIVA'
-                        ? `${DANGER}22`
-                        : `${ACCENT}22`,
-                    color:
-                      normalizeStatus((m as any).status) === 'MANUTENCAO'
-                        ? WARN
-                        : normalizeStatus((m as any).status) === 'INATIVA'
-                        ? DANGER
-                        : ACCENT,
-                  },
-                ]}
-              >
-                {normalizeStatus((m as any).status)}
-              </Text>
-            </View>
-          ))
+          amostra.map((m) => {
+            const norm = normalizeStatus((m as any).status);
+            const badgeBg =
+              norm === 'MANUTENCAO'
+                ? `${WARN}22`
+                : norm === 'INATIVA'
+                ? `${DANGER}22`
+                : `${ACCENT}22`;
+            const badgeFg =
+              norm === 'MANUTENCAO' ? WARN : norm === 'INATIVA' ? DANGER : ACCENT;
+
+            return (
+              <View key={m.id} style={[styles.tr, { borderColor: colors.border }]}>
+                <Text
+                  style={[styles.td, { color: colors.text, fontWeight: '700' }]}
+                >
+                  {m.placa}
+                </Text>
+                <Text style={[styles.td, { color: colors.text, flex: 1 }]}>
+                  {m.modelo || '—'}
+                </Text>
+                <Text
+                  style={[
+                    styles.badge,
+                    {
+                      backgroundColor: badgeBg,
+                      color: badgeFg,
+                    },
+                  ]}
+                >
+                  {norm}
+                </Text>
+              </View>
+            );
+          })
         )}
       </View>
     </ScrollView>
@@ -336,7 +401,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  rowBetween: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   barLabel: { fontWeight: '600' },
   barBg: { height: 10, borderRadius: 999, overflow: 'hidden', marginTop: 6 },
   barFg: { height: 10, borderRadius: 999 },
@@ -354,7 +423,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   trHead: { backgroundColor: 'transparent' },
-  th: { width: 90, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, fontWeight: '700' },
+  th: {
+    width: 90,
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    fontWeight: '700',
+  },
   td: { width: 90, fontSize: 14 },
   badge: {
     paddingHorizontal: 8,

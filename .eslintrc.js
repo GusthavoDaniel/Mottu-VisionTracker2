@@ -1,23 +1,31 @@
 module.exports = {
+  root: true,
   extends: [
     'expo',
     '@react-native-community',
     'plugin:@typescript-eslint/recommended',
+    'prettier',
   ],
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'react-hooks'],
+  plugins: ['@typescript-eslint', 'react-hooks', 'prettier'],
   rules: {
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
     // Regras de qualidade de código
     'no-console': 'warn',
     'no-debugger': 'error',
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_', }],
     
-    // Regras de formatação
-    'indent': ['error', 2],
-    'quotes': ['error', 'single'],
-    'semi': ['error', 'always'],
-    'comma-dangle': ['error', 'never'],
+    // Regras de formatação (desabilitadas ou ajustadas para evitar conflito com Prettier)
+    'indent': 'off', // Deixado para o Prettier
+    'quotes': 'off', // Deixado para o Prettier
+    'semi': 'off', // Deixado para o Prettier
+    'comma-dangle': 'off', // Deixado para o Prettier
     
     // Regras específicas do React
     'react/prop-types': 'off',
