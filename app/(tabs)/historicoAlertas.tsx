@@ -1,4 +1,4 @@
-
+// app/(tabs)/historicoAlertas.tsx
 import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -26,7 +26,6 @@ export default function HistoricoAlertasScreen() {
       setAlertas(res);
     } catch (error) {
       console.error('Erro ao carregar alertas:', error);
-      // Pode adicionar um Alert.alert aqui para notificar o usuário
     } finally {
       setLoading(false);
     }
@@ -46,35 +45,71 @@ export default function HistoricoAlertasScreen() {
     return (
       <View style={[styles.center, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.accent} />
-        <Text style={{ color: colors.text, marginTop: 10 }}>{t('common.loading')}</Text>
+        <Text style={{ color: colors.text, marginTop: 10 }}>
+          {t('common.loading')}
+        </Text>
       </View>
     );
   }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>{t('common.alertHistory')}</Text>
+      <Text style={[styles.title, { color: colors.text }]}>
+        {t('common.alertHistory')}
+      </Text>
+
       {alertas.length === 0 ? (
         <View style={styles.center}>
-          <Text style={[styles.empty, { color: colors.textSecondary }]}>{t('common.noAlertsFound')}</Text>
-          <Text style={[styles.empty, { color: colors.textSecondary }]}>{t('common.pullToRefresh')}</Text>
+          <Text style={[styles.empty, { color: colors.textSecondary }]}>
+            {t('common.noAlertsFound')}
+          </Text>
+          <Text style={[styles.empty, { color: colors.textSecondary }]}>
+            {t('common.pullToRefresh')}
+          </Text>
         </View>
       ) : (
         <FlatList
           data={alertas}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => (
-            <View style={[styles.alertItem, { borderBottomColor: colors.border }]}>
-              <Text style={[styles.alertMessage, { color: colors.text }]}>{item.mensagem}</Text>
-              <Text style={[styles.alertType, { color: colors.textSecondary }]}>{t('common.alertType')}: {item.tipo}</Text>
-              {item.createdAt && (
-                <Text style={[styles.alertDate, { color: colors.textSecondary }]}>
-                  {new Date(item.createdAt).toLocaleString()}
+          renderItem={({ item }) => {
+            // 🔹 Traduções por tipo de alerta
+            const translatedType = t(`alertTypes.${item.tipo}`, {
+              defaultValue: item.tipo,
+            });
+
+            const translatedMessage = t(`alertMessages.${item.tipo}`, {
+              defaultValue: item.mensagem,
+            });
+
+            return (
+              <View
+                style={[styles.alertItem, { borderBottomColor: colors.border }]}
+              >
+                <Text
+                  style={[styles.alertMessage, { color: colors.text }]}
+                >
+                  {translatedMessage}
                 </Text>
-              )}
-            </View>
-          )}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+
+                <Text
+                  style={[styles.alertType, { color: colors.textSecondary }]}
+                >
+                  {t('common.alertType')}: {translatedType}
+                </Text>
+
+                {item.createdAt && (
+                  <Text
+                    style={[styles.alertDate, { color: colors.textSecondary }]}
+                  >
+                    {new Date(item.createdAt).toLocaleString()}
+                  </Text>
+                )}
+              </View>
+            );
+          }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       )}
     </View>
@@ -120,4 +155,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-

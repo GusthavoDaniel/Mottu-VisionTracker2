@@ -1,77 +1,100 @@
-
-import React, { useState, useEffect } from 'react';
+// app/languageSelector.tsx
+import React from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
-  Alert,
 } from 'react-native';
+import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'expo-router';
-import useThemeColors from '../../app/hooks/useThemeColors';
-import i18n from '../../app/i18n'; // Importar a instância do i18n
+import { useTheme } from '../contexts/ThemeContext'; // 👈 IMPORT CERTO
 
-const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'pt', label: 'Português' },
-  { code: 'es', label: 'Español' },
+const LANGS = [
+  { code: 'pt', label: 'Português (Brasil)', flag: '🇧🇷' },
+  { code: 'en', label: 'English', flag: '🇺🇸' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
 ];
 
 export default function LanguageSelectorScreen() {
-  const { t } = useTranslation();
-  const { colors } = useThemeColors();
-  const router = useRouter();
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  const { i18n, t } = useTranslation();
+  const { colors, isDark } = useTheme(); // 👈 AGORA EXISTE :)
 
-  useEffect(() => {
-    // Atualiza o estado local se o idioma do i18n mudar externamente
-    setSelectedLanguage(i18n.language);
+  const current = React.useMemo(() => {
+    const lang = i18n.language || 'pt';
+    if (lang.startsWith('pt')) return 'pt';
+    if (lang.startsWith('es')) return 'es';
+    return 'en';
   }, [i18n.language]);
 
-  const changeLanguage = async (langCode: string) => {
+  const changeLanguage = async (code: string) => {
     try {
-      await i18n.changeLanguage(langCode);
-      setSelectedLanguage(langCode);
-      Alert.alert(t('common.success'), t('languageSelector.languageChangedSuccessfully', { lang: langCode }));
-      router.back(); // Volta para a tela anterior após a mudança
-    } catch (error) {
-      console.error('Erro ao mudar idioma:', error);
-      Alert.alert(t('common.error'), t('languageSelector.languageChangeError'));
+      await i18n.changeLanguage(code);
+      // se quiser, pode exibir um toast/alert usando:
+      // t('languageSelector.languageChangedSuccessfully', { lang: code })
+    } catch (e) {
+      // tratar erro se quiser
     }
   };
 
-  const renderItem = ({ item }: { item: { code: string; label: string } }) => (
-    <TouchableOpacity
-      style={[
-        styles.languageItem,
-        { borderColor: colors.border, backgroundColor: colors.card },
-        selectedLanguage === item.code && { backgroundColor: colors.accent, borderColor: colors.accent },
-      ]}
-      onPress={() => changeLanguage(item.code)}
-    >
-      <Text
-        style={[
-          styles.languageText,
-          { color: colors.text },
-          selectedLanguage === item.code && { color: colors.background },
-        ]}
-      >
-        {item.label}
-      </Text>
-    </TouchableOpacity>
-  );
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>{t('languageSelector.title')}</Text>
-      <FlatList
-        data={LANGUAGES}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.code}
-        contentContainerStyle={styles.listContent}
+      <Stack.Screen
+        options={{
+          title: t('languageSelector.title'),
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text,
+          headerTitleStyle: { color: colors.text },
+        }}
       />
+
+      {LANGS.map((lang) => {
+        const selected = current === lang.code;
+        return (
+          <TouchableOpacity
+            key={lang.code}
+            style={[
+              styles.row,
+              {
+                borderColor: selected ? colors.accent : colors.border,
+                backgroundColor: selected ? colors.card : colors.background,
+              },
+            ]}
+            onPress={() => changeLanguage(lang.code)}
+            activeOpacity={0.8}
+          >
+            <Text
+              style={[
+                styles.flag,
+                { opacity: selected ? 1 : 0.8 },
+              ]}
+            >
+              {lang.flag}
+            </Text>
+
+            <View style={{ flex: 1 }}>
+              <Text
+                style={[
+                  styles.label,
+                  {
+                    color: selected
+                      ? (isDark ? '#000' : '#121212')
+                      : colors.text,
+                  },
+                ]}
+              >
+                {lang.label}
+              </Text>
+
+              {selected && (
+                <Text style={[styles.selectedText, { color: colors.textSecondary }]}>
+                  {t('settings.enabled')}
+                </Text>
+              )}
+            </View>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
@@ -79,28 +102,27 @@ export default function LanguageSelectorScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
-  languageItem: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    marginBottom: 10,
+  row: {
+    flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 10,
   },
-  languageText: {
-    fontSize: 18,
+  flag: {
+    fontSize: 26,
+    marginRight: 12,
+  },
+  label: {
+    fontSize: 16,
     fontWeight: '600',
   },
+  selectedText: {
+    fontSize: 12,
+    marginTop: 2,
+  },
 });
-

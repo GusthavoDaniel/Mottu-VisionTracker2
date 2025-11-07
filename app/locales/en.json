@@ -291,5 +291,19 @@
     "alert2": "Low battery detected on motorcycle ABC9876.",
     "avgStay": "Average patio stay: 2.4 days.",
     "entriesExits24hKpi": "Entries/Exits in last 24h: 12 / 9"
+  },
+
+  "alertTypes": {
+    "bateria_baixa": "Low battery",
+    "fora_da_area": "Out of area",
+    "sem_leitura": "No reading",
+    "manutencao": "Maintenance"
+  },
+
+  "alertMessages": {
+    "bateria_baixa": "Low battery detected on a motorcycle.",
+    "fora_da_area": "Motorcycle left the allowed area.",
+    "sem_leitura": "RFID tag was not read correctly.",
+    "manutencao": "Motorcycle requires maintenance."
   }
 }

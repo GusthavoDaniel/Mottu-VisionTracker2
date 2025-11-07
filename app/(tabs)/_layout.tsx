@@ -98,6 +98,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="motos" options={{ href: null }} />
       <Tabs.Screen name="cadastrarMoto" options={{ href: null }} />
       <Tabs.Screen name="registrarEventoRfid" options={{ href: null }} />
+      <Tabs.Screen name="languageSelector" options={{ href: null }} />
+      <Tabs.Screen name="testNotifications" options={{ href: null }} />
     </Tabs>
   );
 }

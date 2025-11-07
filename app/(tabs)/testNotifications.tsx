@@ -1,155 +1,246 @@
-import React, { useState, useEffect } from 'react';
+// app/(tabs)/testNotifications.tsx
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  Button,
-  TextInput,
   StyleSheet,
-  Alert,
+  TouchableOpacity,
+  TextInput,
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import NotificationService from '../../app/services/notificationService';
-import useThemeColors from '../../app/hooks/useThemeColors';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
+import { Stack } from 'expo-router';
+import * as Clipboard from 'expo-clipboard';
+
+import notificationService, {
+  registerForPushNotificationsAsync,
+  sendTestNotification,
+} from '../services/notificationService';
 
 export default function TestNotificationsScreen() {
-  const { colors } = useThemeColors();
-  const [pushToken, setPushToken] = useState<string | null>(null);
-  const [notificationTitle, setNotificationTitle] = useState('Teste de Notificação');
-  const [notificationBody, setNotificationBody] = useState('Esta é uma notificação de teste.');
-  const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
+  const { colors } = useTheme();
 
-  useEffect(() => {
-    const getAndSetToken = async () => {
-      setLoading(true);
-      const token = await NotificationService.getPushToken();
-      setPushToken(token);
-      setLoading(false);
-    };
-    getAndSetToken();
+  const [token, setToken] = useState<string | null>(null);
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [loadingToken, setLoadingToken] = useState(false);
+  const [sending, setSending] = useState(false);
 
-    const subscription = NotificationService.addNotificationReceivedListener((notification) => {
-      Alert.alert(
-        'Notificação Recebida (Foreground)',
-        `Título: ${notification.request.content.title}\nCorpo: ${notification.request.content.body}`
-      );
-    });
-
-    const responseSubscription = NotificationService.addNotificationResponseReceivedListener((response) => {
-      Alert.alert(
-        'Notificação Interagida',
-        `Ação: ${response.actionIdentifier}\nPayload: ${JSON.stringify(response.notification.request.content.data)}`
-      );
-    });
-
-    return () => {
-      NotificationService.removeNotificationSubscription(subscription);
-      NotificationService.removeNotificationSubscription(responseSubscription);
-    };
-  }, []);
-
-  const handleSendNotification = async () => {
-    setLoading(true);
-    const success = await NotificationService.showNotification({
-      title: notificationTitle,
-      body: notificationBody,
-      data: { customData: 'Hello from app' },
-    });
-    setLoading(false);
-    if (success) {
-      Alert.alert('Sucesso', 'Notificação enviada com sucesso!');
-    } else {
-      Alert.alert('Erro', 'Falha ao enviar notificação. Verifique as permissões.');
-    }
+  const handleGetToken = async () => {
+    setLoadingToken(true);
+    const tkn = await registerForPushNotificationsAsync();
+    setToken(tkn);
+    setLoadingToken(false);
   };
 
-  const handleRequestPermissions = async () => {
-    setLoading(true);
-    const granted = await NotificationService.requestPermissions();
-    setLoading(false);
-    if (granted) {
-      Alert.alert('Permissão Concedida', 'As permissões de notificação foram concedidas.');
-      const token = await NotificationService.getPushToken();
-      setPushToken(token);
-    } else {
-      Alert.alert('Permissão Negada', 'As permissões de notificação foram negadas.');
-    }
+  const handleCopyToken = async () => {
+    if (!token) return;
+    await Clipboard.setStringAsync(token);
   };
 
-  const handleClearBadge = async () => {
-    await NotificationService.clearBadge();
-    Alert.alert('Badge Limpo', 'O contador de notificações foi limpo.');
+  const sendLocal = async () => {
+    setSending(true);
+
+    // Se não preencher nada, usamos um cenário padrão traduzível (data_sync)
+    if (!title.trim() && !body.trim()) {
+      await sendTestNotification('data_sync_title', 'data_sync_body');
+      setSending(false);
+      return;
+    }
+
+    // Se o usuário preencheu, enviamos o texto “cru” mesmo
+    await sendTestNotification(title.trim(), body.trim());
+    setSending(false);
+  };
+
+  const sendScenarioMotoCreated = async () => {
+    setSending(true);
+    await notificationService.notifyMotoCreated({
+      modelo: 'CG 160',
+      placa: 'ABC1D23',
+    });
+    setSending(false);
+  };
+
+  const sendScenarioLogin = async () => {
+    setSending(true);
+    await notificationService.notifyLoginSuccess('Supervisor João');
+    setSending(false);
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>Teste de Notificações Push</Text>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+    >
+      <Stack.Screen
+        options={{
+          title: t('notifications.screenTitle'),
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text,
+        }}
+      />
 
-      <View style={styles.section}>
-        <Text style={[styles.label, { color: colors.text }]}>Seu Expo Push Token:</Text>
-        {loading ? (
-          <ActivityIndicator size="small" color={colors.accent} />
-        ) : (
-          <Text selectable style={[styles.tokenText, { color: colors.textSecondary }]}>
-            {pushToken || 'Nenhum token encontrado.'}
+      {/* TOKEN */}
+      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.label, { color: colors.text }]}>
+          {t('notifications.yourExpoPushToken')}
+        </Text>
+
+        <View style={[styles.tokenBox, { borderColor: colors.border }]}>
+          <Text style={{ color: colors.textSecondary, flex: 1 }} numberOfLines={2}>
+            {token || t('notifications.noTokenFound')}
           </Text>
+
+          <TouchableOpacity
+            style={[styles.smallButton, { borderColor: colors.accent }]}
+            onPress={handleGetToken}
+          >
+            {loadingToken ? (
+              <ActivityIndicator size="small" color={colors.accent} />
+            ) : (
+              <Text style={[styles.smallButtonText, { color: colors.accent }]}>
+                {t('notifications.getToken')}
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {token && (
+          <TouchableOpacity onPress={handleCopyToken} style={{ marginTop: 6 }}>
+            <Text style={{ color: colors.accent, fontSize: 12 }}>
+              (toque para copiar token)
+            </Text>
+          </TouchableOpacity>
         )}
-        <Button
-          title="Obter/Atualizar Token"
-          onPress={handleRequestPermissions}
-          color={colors.accent}
-          disabled={loading}
-        />
       </View>
 
-      <View style={styles.section}>
-        <Text style={[styles.label, { color: colors.text }]}>Título da Notificação:</Text>
+      {/* FORM MANUAL (opcional) */}
+      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>
+          {t('notifications.notificationTitle')}
+        </Text>
         <TextInput
-          style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.surface }]}
-          value={notificationTitle}
-          onChangeText={setNotificationTitle}
-          placeholder="Título"
+          style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+          value={title}
+          onChangeText={setTitle}
+          placeholder={t('notifications.notificationTitle')}
           placeholderTextColor={colors.textSecondary}
-          editable={!loading}
         />
 
-        <Text style={[styles.label, { color: colors.text }]}>Corpo da Notificação:</Text>
+        <Text style={[styles.cardTitle, { color: colors.text, marginTop: 10 }]}>
+          {t('notifications.notificationBody')}
+        </Text>
         <TextInput
-          style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.surface }]}
-          value={notificationBody}
-          onChangeText={setNotificationBody}
-          placeholder="Corpo da mensagem"
-          placeholderTextColor={colors.textSecondary}
+          style={[
+            styles.input,
+            {
+              borderColor: colors.border,
+              color: colors.text,
+              height: 80,
+              textAlignVertical: 'top',
+            },
+          ]}
+          value={body}
+          onChangeText={setBody}
           multiline
-          editable={!loading}
+          numberOfLines={4}
+          placeholder={t('notifications.notificationBody')}
+          placeholderTextColor={colors.textSecondary}
         />
 
-        <Button
-          title="Enviar Notificação Local"
-          onPress={handleSendNotification}
-          color={colors.primary}
-          disabled={loading}
-        />
+        <TouchableOpacity
+          style={[styles.bigButton, { backgroundColor: colors.accent }]}
+          onPress={sendLocal}
+          disabled={sending}
+        >
+          {sending ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Text style={[styles.bigButtonText, { color: '#000' }]}>
+              {t('notifications.sendLocalNotification')}
+            </Text>
+          )}
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.section}>
-        {/* 🔧 trocado de colors.secondary -> colors.accent */}
-        <Button
-          title="Limpar Contador (Badge)"
-          onPress={handleClearBadge}
-          color={colors.accent}
-          disabled={loading}
-        />
+      {/* CENÁRIOS REALISTAS */}
+      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>
+          Cenários rápidos (para o vídeo)
+        </Text>
+
+        <TouchableOpacity
+          style={[styles.scenarioButton, { borderColor: colors.accent }]}
+          onPress={sendScenarioMotoCreated}
+        >
+          <Text style={[styles.scenarioText, { color: colors.accent }]}>
+            🏍️ Nova moto cadastrada
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.scenarioButton, { borderColor: colors.accent }]}
+          onPress={sendScenarioLogin}
+        >
+          <Text style={[styles.scenarioText, { color: colors.accent }]}>
+            👋 Login realizado com sucesso
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-  section: { marginBottom: 30, padding: 15, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.05)' },
-  label: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
-  tokenText: { fontSize: 14, marginBottom: 10, padding: 10, borderRadius: 5, backgroundColor: 'rgba(0,0,0,0.03)' },
-  input: { borderWidth: 1, borderRadius: 8, padding: 10, marginBottom: 10, minHeight: 40 },
+  container: { flex: 1 },
+  card: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+  },
+  label: { fontSize: 14, fontWeight: '600', marginBottom: 8 },
+  tokenBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    gap: 8,
+  },
+  smallButton: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  smallButtonText: { fontSize: 12, fontWeight: '600' },
+  cardTitle: { fontSize: 15, fontWeight: '700', marginBottom: 6 },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 14,
+  },
+  bigButton: {
+    marginTop: 12,
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  bigButtonText: { fontSize: 15, fontWeight: '700' },
+  scenarioButton: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    marginTop: 8,
+  },
+  scenarioText: { fontWeight: '600', fontSize: 14 },
 });

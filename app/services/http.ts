@@ -1,6 +1,6 @@
 export const API_BASE =
   (process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '') ||
-    (__DEV__ ? 'http://10.0.2.2:8080' : 'http://localhost:8080'));
+    (__DEV__ ? 'http://192.168.0.66' : 'http://localhost:8080'));
 
 type Opts = {
   method?: string;

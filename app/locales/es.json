@@ -291,5 +291,19 @@
     "alert2": "Batería baja detectada en la moto ABC9876.",
     "avgStay": "Estancia promedio en patio: 2,4 días.",
     "entriesExits24hKpi": "Entradas/Salidas últimas 24h: 12 / 9"
+  },
+
+  "alertTypes": {
+    "bateria_baixa": "Batería baja",
+    "fora_da_area": "Fuera de área",
+    "sem_leitura": "Sin lectura",
+    "manutencao": "Mantenimiento"
+  },
+
+  "alertMessages": {
+    "bateria_baixa": "Se detectó batería baja en una motocicleta.",
+    "fora_da_area": "La motocicleta salió del área permitida.",
+    "sem_leitura": "La etiqueta RFID no se leyó correctamente.",
+    "manutencao": "La motocicleta necesita mantenimiento."
   }
 }

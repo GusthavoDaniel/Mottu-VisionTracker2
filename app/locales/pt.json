@@ -273,5 +273,19 @@
     "alert2": "Bateria crítica na moto ABC9876.",
     "avgStay": "Permanência média no pátio: 2,4 dias.",
     "entriesExits24hKpi": "Entradas/Saídas nas últimas 24h: 12 / 9"
+  },
+
+  "alertTypes": {
+    "bateria_baixa": "Bateria baixa",
+    "fora_da_area": "Fora da área",
+    "sem_leitura": "Sem leitura",
+    "manutencao": "Manutenção"
+  },
+
+  "alertMessages": {
+    "bateria_baixa": "Bateria baixa detectada em uma moto.",
+    "fora_da_area": "Moto saiu da área permitida.",
+    "sem_leitura": "Tag RFID não foi lida corretamente.",
+    "manutencao": "Moto precisa de manutenção."
   }
 }
