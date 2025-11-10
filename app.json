@@ -6,38 +6,48 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+
     "ios": {
       "supportsTablet": true
     },
+
     "android": {
       "package": "com.fiap.mottuvisiontracker",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "useNextNotificationsApi": true
     },
+
     "web": {
       "favicon": "./assets/icon.png"
     },
+
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "expo-notifications"
     ],
+
     "scheme": "mottuvisiontracker",
     "sdkVersion": "53.0.0",
+
     "extra": {
       "router": {},
       "eas": {
         "projectId": "0c31be9e-e90c-4664-b87a-50484cfe9f45"
       }
     },
+
     "owner": "gusthavofiap"
   }
 }

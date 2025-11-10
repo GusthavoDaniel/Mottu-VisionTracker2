@@ -15,6 +15,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useMotoContext } from '../contexts/MotoContext';
 import { useTheme } from '../contexts/ThemeContext';
+import NotificationService from '../services/notificationService'; // ✅ IMPORTANTE
 
 const MODELOS_MOTOS = ['CG 160', 'Factor 125', 'Biz 125', 'PCX 150', 'CB 600F'] as const;
 const CORES_MOTOS = ['Preta', 'Verde Mottu', 'Branca', 'Vermelha', 'Azul'] as const;
@@ -37,6 +38,7 @@ export default function CadastrarMotoScreen() {
   const [openCor, setOpenCor] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
 
+  // Monitora erros do contexto
   useEffect(() => {
     if (error) {
       Alert.alert(t('common.error'), error, [{ text: t('common.ok'), onPress: clearError }]);
@@ -75,7 +77,6 @@ export default function CadastrarMotoScreen() {
     if (isLoading) return;
     if (!validarFormulario()) return;
 
-    // mapeia para o status da API
     const statusApi =
       status === 'manutencao' ? 'MANUTENCAO' : status === 'inativa' ? 'INATIVA' : 'ATIVA';
 
@@ -93,6 +94,13 @@ export default function CadastrarMotoScreen() {
     });
 
     if (sucesso) {
+      // ✅ Dispara notificação visual (sem som)
+      await NotificationService.notifyMotoCreated({
+        modelo,
+        placa: placaSanitizada,
+      });
+
+      // ✅ Alerta de sucesso + redirecionamento
       Alert.alert(
         t('common.success'),
         t('cadastrarMoto.successMessage', { modelo, placa: placaSanitizada }),
@@ -124,7 +132,7 @@ export default function CadastrarMotoScreen() {
     t,
   ]);
 
-  // componente genérico para select
+  // Picker genérico
   const ItemPicker = ({
     labelKey,
     value,
@@ -334,9 +342,7 @@ export default function CadastrarMotoScreen() {
           style={[
             styles.button,
             {
-              backgroundColor: isLoading
-                ? colors.textSecondary
-                : colors.accent,
+              backgroundColor: isLoading ? colors.textSecondary : colors.accent,
             },
           ]}
           onPress={handleCadastrar}
@@ -346,9 +352,7 @@ export default function CadastrarMotoScreen() {
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text
-              style={[styles.buttonText, { color: '#fff' }]}
-            >
+            <Text style={[styles.buttonText, { color: '#fff' }]}>
               {t('cadastrarMoto.buttonText')}
             </Text>
           )}
@@ -361,9 +365,7 @@ export default function CadastrarMotoScreen() {
           disabled={isLoading}
           activeOpacity={0.7}
         >
-          <Text
-            style={[styles.backButtonText, { color: colors.accent }]}
-          >
+          <Text style={[styles.backButtonText, { color: colors.accent }]}>
             {t('common.back')}
           </Text>
         </TouchableOpacity>

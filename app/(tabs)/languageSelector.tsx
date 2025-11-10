@@ -1,97 +1,72 @@
-// app/languageSelector.tsx
-import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import { Stack } from 'expo-router';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '../contexts/ThemeContext'; // 👈 IMPORT CERTO
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../i18n';
+import NotificationService from '../services/notificationService';
 
-const LANGS = [
-  { code: 'pt', label: 'Português (Brasil)', flag: '🇧🇷' },
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
+type LangCode = 'pt' | 'en' | 'es';
+
+const languages: { code: LangCode; label: string }[] = [
+  { code: 'pt', label: 'Português (Brasil)' },
+  { code: 'en', label: 'English' },
+  { code: 'es', label: 'Español' },
 ];
 
 export default function LanguageSelectorScreen() {
-  const { i18n, t } = useTranslation();
-  const { colors, isDark } = useTheme(); // 👈 AGORA EXISTE :)
+  const [currentLang, setCurrentLang] = useState<LangCode>('pt');
+  const [isSaving, setIsSaving] = useState(false);
 
-  const current = React.useMemo(() => {
-    const lang = i18n.language || 'pt';
-    if (lang.startsWith('pt')) return 'pt';
-    if (lang.startsWith('es')) return 'es';
-    return 'en';
-  }, [i18n.language]);
+  // Carrega idioma salvo no AsyncStorage
+  useEffect(() => {
+    (async () => {
+      const stored = (await AsyncStorage.getItem('@language')) as LangCode | null;
+      if (stored) {
+        setCurrentLang(stored);
+      } else {
+        setCurrentLang((i18n.language as LangCode) ?? 'pt');
+      }
+    })();
+  }, []);
 
-  const changeLanguage = async (code: string) => {
+  const handleChangeLanguage = async (langCode: LangCode) => {
+    if (langCode === currentLang) return;
+
     try {
-      await i18n.changeLanguage(code);
-      // se quiser, pode exibir um toast/alert usando:
-      // t('languageSelector.languageChangedSuccessfully', { lang: code })
-    } catch (e) {
-      // tratar erro se quiser
+      setIsSaving(true);
+
+      // 🌍 Troca o idioma
+      await i18n.changeLanguage(langCode);
+      await AsyncStorage.setItem('@language', langCode);
+      setCurrentLang(langCode);
+
+      // 🔔 Dispara notificação visual (sem som)
+      await NotificationService.notifyLanguageChanged(langCode);
+    } catch (error) {
+      console.log('Erro ao trocar idioma', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Stack.Screen
-        options={{
-          title: t('languageSelector.title'),
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.text,
-          headerTitleStyle: { color: colors.text },
-        }}
-      />
+    <View style={styles.container}>
+      <Text style={styles.title}>{i18n.t('languageSelector.title')}</Text>
 
-      {LANGS.map((lang) => {
-        const selected = current === lang.code;
+      {languages.map((lang) => {
+        const isActive = lang.code === currentLang;
         return (
           <TouchableOpacity
             key={lang.code}
-            style={[
-              styles.row,
-              {
-                borderColor: selected ? colors.accent : colors.border,
-                backgroundColor: selected ? colors.card : colors.background,
-              },
-            ]}
-            onPress={() => changeLanguage(lang.code)}
-            activeOpacity={0.8}
+            style={[styles.item, isActive && styles.itemActive]}
+            onPress={() => handleChangeLanguage(lang.code)}
+            disabled={isSaving}
           >
-            <Text
-              style={[
-                styles.flag,
-                { opacity: selected ? 1 : 0.8 },
-              ]}
-            >
-              {lang.flag}
-            </Text>
-
-            <View style={{ flex: 1 }}>
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    color: selected
-                      ? (isDark ? '#000' : '#121212')
-                      : colors.text,
-                  },
-                ]}
-              >
-                {lang.label}
+            <Text style={styles.itemText}>{lang.label}</Text>
+            {isActive && (
+              <Text style={styles.badge}>
+                {i18n.t('settings.enabled')}
               </Text>
-
-              {selected && (
-                <Text style={[styles.selectedText, { color: colors.textSecondary }]}>
-                  {t('settings.enabled')}
-                </Text>
-              )}
-            </View>
+            )}
           </TouchableOpacity>
         );
       })}
@@ -104,25 +79,31 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 16,
+  },
+  item: {
+    backgroundColor: '#f5f5f5',
+    padding: 16,
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 10,
+    marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  flag: {
-    fontSize: 26,
-    marginRight: 12,
+  itemActive: {
+    borderWidth: 1,
+    borderColor: '#00C851',
+    backgroundColor: '#E8FFF3',
   },
-  label: {
+  itemText: {
     fontSize: 16,
-    fontWeight: '600',
   },
-  selectedText: {
+  badge: {
     fontSize: 12,
-    marginTop: 2,
+    color: '#00C851',
+    fontWeight: '600',
   },
 });

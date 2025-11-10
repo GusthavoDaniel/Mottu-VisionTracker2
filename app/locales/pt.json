@@ -79,6 +79,24 @@
     "motoDeleted": "Moto {{model}} ({{plate}}) removida do sistema."
   },
 
+  "notifications": {
+    "screenTitle": "Teste de Notificações Push",
+    "yourExpoPushToken": "Seu token Expo Push:",
+    "noTokenFound": "Nenhum token encontrado.",
+    "getToken": "Obter/Atualizar Token",
+    "notificationTitle": "Título da notificação:",
+    "notificationBody": "Corpo da notificação:",
+    "sendLocalNotification": "Enviar notificação local",
+    "clearBadge": "Limpar badge",
+    "permissionGranted": "Permissão concedida",
+    "permissionDenied": "Permissão negada",
+    "notificationSent": "Notificação enviada com sucesso!",
+    "notificationFailed": "Falha ao enviar notificação. Verifique as permissões.",
+    "badgeCleared": "Badge limpo.",
+    "notificationReceivedForeground": "Notificação recebida (foreground)",
+    "notificationInteracted": "Notificação interagida"
+  },
+
   "cadastrarMoto": {
     "title": "Cadastrar Nova Moto",
     "placaLabel": "Placa",

@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useContext,
@@ -26,12 +25,10 @@ interface AuthContextProps {
   isAuthenticated: boolean;
   clearError: () => void;
 
-  
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
 
-  
   setSession: (u: User | null) => Promise<void>;
 }
 
@@ -41,7 +38,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
 
   const clearError = () => setError(null);
 
@@ -105,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!validateEmail(e)) return { success: false, error: 'Formato de email inválido' };
       if (!p) return { success: false, error: 'Senha é obrigatória' };
 
-      
+      // 1) Tenta login via API
       const api = await ApiService.login(e, p);
       if (api.success && api.data) {
         const u: User = {
@@ -116,16 +112,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
         await setSession(u);
 
-        // Registrar o token de push após o login bem-sucedido
+        // 2) Registrar o token de push após o login bem-sucedido
         const pushToken = await NotificationService.getPushToken();
         if (pushToken && u.id) {
-          await ApiService.registerPushToken(pushToken, u.id);
+          try {
+            await ApiService.registerPushToken(pushToken, u.id);
+          } catch (e) {
+            console.log('[AuthContext] Erro ao registrar push token na API', e);
+          }
+        }
+
+        // 3) Opcional: notificação de boas-vindas
+        try {
+          await NotificationService.notifyLoginSuccess(u.name);
+        } catch (e) {
+          console.log('[AuthContext] Erro ao disparar notificação de login', e);
         }
 
         return { success: true };
       }
 
-      
+      // 4) Fallback: login local salvo no AsyncStorage
       const usersData = await AsyncStorage.getItem('@users');
       const users = usersData ? JSON.parse(usersData) : [];
       const found = users.find((u: any) => u.email === e && u.password === p);
@@ -162,7 +169,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const pass = validatePassword(p);
       if (!pass.isValid) return { success: false, error: pass.message };
 
-      
+      // 1) Tenta registrar na API
       const api = await ApiService.register(n, e, p);
       if (api.success && api.data) {
         const u: User = {
@@ -175,7 +182,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { success: true };
       }
 
-      
+      // 2) Fallback: cadastro local em AsyncStorage
       const usersData = await AsyncStorage.getItem('@users');
       const users = usersData ? JSON.parse(usersData) : [];
       if (users.find((u: any) => u.email === e)) {
@@ -202,16 +209,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
 
     try {
-      
-      try { await ApiService.logout(); } catch (e) { /* ignora erro de rede */ }
-      
+      try {
+        await ApiService.logout();
+      } catch {
+        // ignora erro de rede no logout
+      }
+
       await setSession(null);
       setError(null);
-
     } finally {
-
       setIsLoading(false);
-      
       router.replace('/auth/login');
     }
   };
@@ -235,6 +242,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-
 export const useAuth = () => useContext(AuthContext);
-
