@@ -1,104 +1,187 @@
-# Mottu VisionTracker
+# 🏍️ Mottu VisionTracker
 
-## Proposta e Funcionalidades
+## 🎯 Proposta e Objetivo
 
-O **Mottu VisionTracker** é um aplicativo móvel desenvolvido em **React Native** com **Expo** e uma API de backend em **Java com Spring Boot**, projetado para ser uma solução completa de **Gestão Inteligente de Pátio** para frotas de motocicletas.
+O **Mottu VisionTracker** é um aplicativo móvel desenvolvido em **React Native (Expo)** com uma **API Java Spring Boot**, criado como solução de **Gestão Inteligente de Pátio** para motocicletas da Mottu.
 
-### Funcionalidades Implementadas (Requisitos FIAP)
+Ele oferece controle completo de motos, notificações com som, troca de idioma, modo escuro e integração entre **frontend (Expo)**, **backend (Spring Boot)** e **serviços em nuvem (Firebase e Azure)**.
 
-| Requisito | Descrição | Status |
-| :--- | :--- | :--- |
-| **1. Telas Funcionais** | Implementação funcional de todas as telas do app. | **COMPLETO** |
-| **3. Notificação via Push** | Cenário realista de envio e recebimento de notificações push (via Expo). | **COMPLETO** |
-| **4. Integração com API** | Implementação de operações CRUD completas e tratamento de formulários (validações, feedback) com a API Java. | **COMPLETO** |
-| **5. Localização e Internacionalização** | Suporte aos idiomas Português (pt), Espanhol (es) e Inglês (en), com troca automática e gerenciamento de strings. | **COMPLETO** |
-| **6. Estilização com Tema** | Suporte a modo claro e modo escuro (Dark/Light Mode), com toggle manual na tela principal. | **COMPLETO** |
-| **7. Arquitetura de Código** | Organização lógica de arquivos, separação de responsabilidades (componentes, serviços, contextos) e padronização com ESLint/Prettier. | **COMPLETO** |
-| **8. Documentação e Apresentação** | README completo e gravação de vídeo demonstrando o app. | **COMPLETO** |
-| **2. Publicação do app** | Publicação do app no Firebase App Distribution e tela "Sobre o App" com hash do commit. | **PENDENTE** |
-
-### Telas Principais
-
-*   **Dashboard:** Visão geral do pátio, KPIs operacionais (permanência média, entradas/saídas) e alertas críticos.
-*   **Motos:** Listagem, busca, cadastro, edição e exclusão (CRUD completo) de motocicletas.
-*   **Alertas:** Histórico de alertas recebidos.
-*   **Mapa do Pátio:** Visualização da localização das motos (simulado).
-*   **Testes:** Tela para testar o envio e recebimento de notificações push.
-*   **Configurações:** Tela para seleção de idioma e alternância de tema (Dark/Light Mode).
-
-## Arquitetura do Projeto
-
-O projeto é composto por duas partes principais:
-
-*   **Frontend**: Aplicativo móvel desenvolvido em **React Native** com **Expo**, utilizando **Firebase Authentication** para o login e **i18next** para internacionalização.
-*   **Backend**: API RESTful desenvolvida em **Java** com **Spring Boot**, utilizando **Spring Data JPA** para persistência de dados.
-
-## Estrutura de Pastas
-
-```
-Mottu-VisionTracker2/
-├── app/                     # Frontend React Native (Expo)
-│   ├── (auth)/              # Telas de autenticação (login, cadastro)
-│   ├── (tabs)/              # Telas principais (Dashboard, Motos, Alertas, etc.)
-│   ├── assets/              # Imagens, ícones
-│   ├── components/          # Componentes reutilizáveis da UI
-│   ├── contexts/            # Contextos React (AuthContext, MotoContext, ThemeContext)
-│   ├── hooks/               # Hooks personalizados
-│   ├── locales/             # Arquivos de tradução (pt.json, es.json, en.json)
-│   ├── services/            # Serviços de API (Firebase, API Java, Notificações)
-│   ├── types/               # Definições de tipos TypeScript
-│   ├── i18n.ts              # Configuração do i18next
-│   └── ...                  # Outros arquivos de configuração do Expo/RN
-├── backend/                 # Backend Java Spring Boot
-│   └── mottu-visiontracker-api/
-│       └── src/             # Código fonte da API
-├── .eslintrc.js             # Configuração do ESLint (qualidade de código)
-├── .prettierrc.js           # Configuração do Prettier (formatação)
-└── README.md                # Este arquivo
-```
-
-## Integrantes
+## 👥 Integrantes
 
 | Nome | RM | GitHub |
 | :--- | :--- | :--- |
-| **Gusthavo Daniel de Souza** | 554681 | [GusthavoDaniel](https://github.com/GusthavoDaniel) |
-| **Guilherme Damasio Roselli** | 555873 | [GuilhermeDamasioRoselli](https://github.com/GuilhermeDamasioRoselli) |
-| **Lucas Miranda Leite** | 555161 | [LucasMirandaLeite](https://github.com/LucasMirandaLeite) |
+| **Gusthavo Daniel de Souza** | 554681 | [@GusthavoDaniel](https://github.com/GusthavoDaniel) |
+| **Guilherme Damasio Roselli** | 555873 | [@GuilhermeDamasioRoselli](https://github.com/GuilhermeDamasioRoselli) |
+| **Lucas Miranda Leite** | 555161 | [@LucasMirandaLeite](https://github.com/LucasMirandaLeite) |
+---
 
-## Como Executar o Projeto
+## ✅ Funcionalidades Implementadas (Requisitos FIAP)
 
-### 1. Backend (API Java Spring Boot)
+| Nº | Requisito | Descrição | Status |
+|:--:|:-----------|:-----------|:------:|
+| **1** | Telas Funcionais | Todas as telas implementadas (CRUD, configurações, alertas, mapa, etc). | ✅ COMPLETO |
+| **2** | Publicação do App | Aplicativo hospedado no **Firebase Hosting**, pronto para o **App Distribution**. | ⚙️ PARCIAL |
+| **3** | Notificações Push | Envio e recebimento de notificações locais com **som ativo (Expo Notifications)**. | ✅ COMPLETO |
+| **4** | Integração com API | CRUD completo integrado com a API Java (Spring Boot). | ✅ COMPLETO |
+| **5** | Localização e Internacionalização | Suporte multilíngue (pt, es, en) via **i18next**, com troca dinâmica. | ✅ COMPLETO |
+| **6** | Estilização com Tema | Modo claro/escuro persistente, alternável pelo usuário. | ✅ COMPLETO |
+| **7** | Arquitetura e Organização | Código padronizado com **ESLint**, **Prettier** e **TypeScript**. | ✅ COMPLETO |
+| **8** | Documentação e Apresentação | README completo + vídeo explicativo. | ✅ COMPLETO |
 
-**Pré-requisitos:** Java Development Kit (JDK) 11+, Apache Maven 3.6+.
+---
 
-1.  Navegue até o diretório do backend: `cd Mottu-VisionTracker2/backend/mottu-visiontracker-api`
-2.  Compile e execute a aplicação: `mvn clean install spring-boot:run`
-    *   A API estará disponível em `http://localhost:8080`.
+## 📱 Telas Principais
 
-### 2. Frontend (Aplicativo React Native)
+- **Dashboard:** visão geral do pátio e KPIs operacionais.  
+- **Motos:** cadastro, listagem, edição e exclusão (CRUD completo).  
+- **Alertas:** histórico de notificações recebidas.  
+- **Mapa do Pátio:** exibição visual da disposição das motos.  
+- **Configurações:** seleção de idioma, alternância de tema e testes de notificação.  
+- **Testes:** tela dedicada para testar notificações e funcionalidades locais.  
 
-**Pré-requisitos:** Node.js (LTS), npm/Yarn, Expo CLI.
+---
 
-1.  Navegue até o diretório do frontend: `cd Mottu-VisionTracker2`
-2.  Instale as dependências: `npm install`
-3.  Inicie o servidor de desenvolvimento: `npm start`
-4.  Use o aplicativo Expo Go no seu celular ou um emulador/simulador para escanear o QR code.
+## 🧩 Arquitetura Geral
 
-### Comandos de Qualidade de Código
+### **Frontend (React Native + Expo + Firebase)**
+- Aplicativo mobile com suporte a temas e idiomas.
+- Sistema de notificações push com som (via **expo-notifications**).
+- Deploy no **Firebase Hosting**.
 
-Para garantir a padronização e o código limpo (Requisito 7):
+### **Backend (Java + Spring Boot + Azure)**
+- API RESTful hospedada no **Azure App Service**.
+- Persistência no **Azure PostgreSQL Flexible Server**.
+- CRUD completo de motos, integrado ao app via REST API.
 
-*   **Verificar Lint:** `npm run lint`
-*   **Corrigir Lint:** `npm run lint:fix`
-*   **Formatar Código:** `npm run format`
-*   **Verificar Tipagem:** `npm run type-check`
+---
 
-## Próximos Passos (Publicação)
+## 🗂️ Estrutura de Pastas
 
-O único requisito pendente é a **Publicação do App** (Requisito 2). Para isso, é necessário:
+Mottu-VisionTracker2/
+├── app/ # Frontend React Native (Expo)
+│ ├── (auth)/ # Telas de login e cadastro
+│ ├── (tabs)/ # Telas principais
+│ ├── assets/ # Ícones e imagens
+│ ├── components/ # Componentes de interface reutilizáveis
+│ ├── contexts/ # Contextos React (Auth, Moto, Theme)
+│ ├── hooks/ # Hooks personalizados
+│ ├── locales/ # Traduções (pt, es, en)
+│ ├── services/ # Serviços (API, notificações, autenticação)
+│ ├── types/ # Tipagens TypeScript
+│ ├── i18n.ts # Configuração do i18next
+│ └── App.tsx # Ponto de entrada do app
+├── backend/ # Backend Java Spring Boot
+│ └── mottu-visiontracker-api/
+│ └── src/ # Código-fonte da API
+├── .eslintrc.js
+├── .prettierrc.js
+├── package.json
+└── README.md
 
-1.  Criar a tela "Sobre o App" com o hash do commit.
-2.  Gerar o build do aplicativo para Android/iOS e distribuí-lo via Firebase App Distribution. (Esta etapa requer acesso a contas de desenvolvedor e configurações que não podem ser feitas no ambiente sandbox).
+less
+Copiar código
 
-**Recomendação:** O próximo passo seria o usuário gerar o build do app e fazer o upload para o Firebase App Distribution.
+---
 
+
+## ⚙️ Como Executar o Projeto
+
+### 🖥️ 1. Backend (API Java Spring Boot)
+
+**Pré-requisitos:**  
+Java Development Kit (JDK) **11+**, Apache Maven **3.6+**, e PostgreSQL configurado.
+
+**Passos:**
+```bash
+# Acesse o diretório do backend
+cd Mottu-VisionTracker2/backend/mottu-visiontracker-api
+
+# Compile e execute o projeto
+mvn clean install spring-boot:run
+A API estará disponível em:
+👉 http://localhost:8080
+
+No ambiente de produção, a API também está hospedada em:
+🌐 https://mottuvision-api.azurewebsites.net
+
+📱 2. Frontend (React Native + Expo)
+Pré-requisitos:
+Node.js LTS, npm/yarn, e Expo CLI instalado globalmente.
+
+Passos:
+
+bash
+Copiar código
+# Acesse o diretório principal do app
+cd Mottu-VisionTracker2
+
+# Instale as dependências
+npm install
+
+# Inicie o servidor Expo
+npm start
+Abra o Expo Go no seu celular e escaneie o QR Code para visualizar o app.
+
+🔔 Notificações Push (com Som)
+O app usa o pacote expo-notifications para envio e exibição de notificações locais com som.
+
+Exemplos:
+Ao cadastrar uma moto, é exibida uma notificação sonora com o nome e placa.
+
+Ao alterar o idioma, o usuário recebe um alerta confirmando a mudança.
+
+Essas notificações usam o canal padrão Android:
+
+ts
+Copiar código
+Notifications.setNotificationChannelAsync('default', {
+  name: 'default',
+  importance: Notifications.AndroidImportance.MAX,
+  sound: 'default',
+});
+🌍 Internacionalização (i18n)
+O aplicativo possui suporte a:
+
+🇧🇷 Português
+
+🇪🇸 Espanhol
+
+🇺🇸 Inglês
+
+O idioma é salvo localmente em @language (via AsyncStorage) e carregado automaticamente ao abrir o app.
+
+🌓 Tema Dinâmico
+Alternância manual entre modo claro e modo escuro.
+
+Persistência do tema ativo (via ThemeContext e AsyncStorage).
+
+🧠 Qualidade de Código
+Scripts configurados para manter o projeto limpo e padronizado:
+
+bash
+Copiar código
+npm run lint        # Verifica padrões de código
+npm run lint:fix    # Corrige erros automaticamente
+npm run format      # Formata o código com Prettier
+npm run type-check  # Verifica tipagem TypeScript
+☁️ Publicação e Deploy
+🔹 Frontend
+Hospedado no Firebase Hosting
+Para atualizar a versão hospedada:
+
+bash
+Copiar código
+expo export:web
+firebase deploy
+🔹 Backend
+Hospedado no Azure App Service com CI/CD via Azure DevOps Pipeline.
+
+🏁 Status Atual do Projeto
+Módulo	Situação
+Frontend (Expo + Firebase)	✅ Concluído e hospedado
+Backend (Spring Boot + Azure)	✅ Concluído e hospedado
+Notificações com Som (Expo)	✅ Ativas e funcionais
+Tema e Idiomas (i18n)	✅ Operando corretamente
+Publicação App Distribution (APK) ✅
+
+Desenvolvido com 💙 por alunos da FIAP — ADS 2TDS (2025).
